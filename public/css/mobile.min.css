@@ -1,0 +1,57 @@
+#content{
+    overflow: inherit;
+}
+
+#main,footer,.module,#login,#register,header #topWrapper,#contactForm, #loginForm, #registerForm{
+    width:auto;
+}
+
+#main{
+    margin-top:20px;
+}
+
+.module{
+    margin:20px auto;
+}
+
+.module h1{
+    font-size:14px;
+}
+
+.module .hideToggle{
+    font-size:16px;
+}
+
+.module .verticalFeedList .feedBody{
+    width:170px;
+}
+
+.module .verticalFeedList .feedThumbnail img{
+    width:150px;
+    height:auto;
+}
+
+header nav ul li{
+    padding-top: 8px;
+    height: 32px;
+}
+
+nav ul li a{
+    padding:5px;
+}
+
+.verticalFeedList .feedTitle, .verticalFeedList .feedShare{
+    float:none;
+    display:block;
+}
+
+.verticalFeedList .feedShare{
+    margin:7px 0;
+}
+
+#feed iframe{
+    min-width:340px;
+    width:auto;
+    height:auto;
+    margin:0 auto;
+}

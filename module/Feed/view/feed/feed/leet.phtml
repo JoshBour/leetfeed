@@ -1,0 +1,16 @@
+<div id="main">
+    <div id="history" class="module">
+        <h1>Leet'ed Feeds</h1>
+        <?php if(count($feeds) > 0){ ?>
+        <ul class="verticalFeedList">
+            <?php
+            foreach ($feeds as $feed){
+                echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+            }
+            ?>
+        </ul>
+        <?php }else{ ?>
+            You haven't leet'ed any feeds yet.
+        <?php } ?>
+    </div>
+</div>

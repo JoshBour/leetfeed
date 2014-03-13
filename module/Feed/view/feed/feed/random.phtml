@@ -1,0 +1,69 @@
+<?php
+$id = $feed->getVideoId();
+$feedId = $feed->getFeedId();
+$author = $feed->getAuthor();
+?>
+<div id="main">
+    <div id="feed" class="feed-<?php echo $feedId; ?>">
+        <iframe width="965" height="576" src="http://www.youtube.com/embed/<?php echo $id; ?>?enablejsapi=1&autoplay=1"
+                frameborder="0"
+                allowfullscreen></iframe>
+    </div>
+    <div id="info" class="module">
+        <h1>Info</h1>
+
+        <div class="wrapper">
+            <div id="share">
+                <a class="fb-share openInWindow" title="Share this feed on Facebook!"
+                   href="https://facebook.com/sharer.php?app_id=268335233334900&sdk=joey&u=http://www.leetfeed.com/feed/<?php echo $feedId; ?>&display=popup">Share</a>
+                <a class="twitter-share openInWindow" title="Tweet about this feed on Twitter!"
+                   href="https://twitter.com/intent/tweet?hashtags=leetfeed&original_referer=http://www.leetfeed.com&text=<?php echo $title . " leetfeed.com/feed/{$feedId}"; ?>&tw_p=tweetbutton&url=%2Ffeed%2F1268&via=leetfeed">Share</a>
+            </div>
+            <div id="title"><?php echo $feed->getTitle(); ?></div>
+            <div id="uploaded">by <a href="http://www.youtube.com/user/<?php echo $author; ?>" id="uploader"
+                                     target="_blank"><?php echo $author; ?></a></div>
+            <div id="rating">
+                <?php
+                if ($account && $rating = $account->getRated($feedId)) {
+                    if ($rating->getRating() == 1) {
+                        $up = ' class=" disabled" ';
+                        $down = '';
+                    } else {
+                        $up = '';
+                        $down = ' class=" disabled" ';
+                    }
+                } else {
+                    $up = '';
+                    $down = '';
+                }
+                ?>
+                <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>" id="thumbUp" <?php echo $up; ?>title="I like this feed!"><span class="icon"/></span>
+                    Leet!</a>
+                <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>" id="thumbDown"<?php echo $down; ?> title="This feed is meh."><span class="icon"></span>Meh!</a>
+
+                <div id="total"><span class="icon"></span><span class="count"><?php echo $feed->getRating(); ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="meta" class="module shadowed">
+        <h1>Description</h1>
+
+        <div id="description">
+            <p>
+                <?php echo nl2br($feed->getDescription()); ?>
+            </p>
+        </div>
+    </div>
+    <div id="related" class="module shadowed">
+        <div class="hideToggle shadowed">Hide</div>
+        <h1>Related Feeds</h1>
+        <ul class="verticalFeedList">
+            <?php
+            foreach ($relatedFeeds as $feed) {
+                echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+            }
+            ?>
+        </ul>
+    </div>
+</div>

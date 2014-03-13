@@ -1,0 +1,16 @@
+<div id="main">
+    <div id="history" class="module">
+        <h1>History</h1>
+        <?php if($feeds->count() > 0){ ?>
+        <ul class="verticalFeedList">
+            <?php
+            foreach ($feeds as $feed){
+                echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+            }
+            ?>
+        </ul>
+        <?php }else{ ?>
+            You haven't watched any feeds yet.
+        <?php } ?>
+    </div>
+</div>

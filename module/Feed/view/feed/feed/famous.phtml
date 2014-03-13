@@ -1,0 +1,27 @@
+<div id="main">
+    <div class="module">
+        <h1>Youtubers / Pros</h1>
+        <ul id="youtubers">
+        <?php foreach($youtubers as $youtuber): ?>
+            <li<?php if($randomYoutuber->getYoutuberId() == $youtuber->getYoutuberId()) echo ' class="active" ' ?>>
+                <img src="<?php echo $youtuber->getThumbnail(); ?>" />
+                <span class="youtuber-<?php echo $youtuber->getName(); ?>"><?php echo $youtuber->getIgName(); ?></span>
+            </li>
+        <?php endforeach; ?>
+        </ul>
+    </div>
+    <div class="module">
+        <h1><?php echo $randomYoutuber->getIgName(); ?>'s Latest Feeds</h1>
+        <?php if(count($feeds) > 0){ ?>
+            <ul class="verticalFeedList" id="youtubersFeeds">
+                <?php
+                foreach ($feeds as $feed){
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                }
+                ?>
+            </ul>
+        <?php }else{ ?>
+            You haven't leet'ed any feeds yet.
+        <?php } ?>
+    </div>
+</div>
