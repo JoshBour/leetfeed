@@ -1,7 +1,5 @@
 <?php
-namespace Feed\Model;
-
-use ZendGData\YouTube\VideoEntry;
+namespace Youtube\Model;
 
 class YoutubeEntry
 {

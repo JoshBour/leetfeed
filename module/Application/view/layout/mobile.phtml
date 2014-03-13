@@ -64,6 +64,7 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
     ?>
     <script>
         var baseUrl = '<?php echo $this->basePath(); ?>';
+        var isMobile = true;
     </script>
     <script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
     <script>
@@ -102,8 +103,6 @@ if (!empty($messages)) :
             <a href="<?php echo $this->url('home'); ?>"
                title="<?php echo $this->translate("Leetfeed"); ?>">Logo</a>
         </div>
-        <div class="fb-like" data-href="https://www.facebook.com/leetfeed" data-layout="button_count" data-action="like"
-             data-show-faces="false" data-share="false"></div>
         <nav>
             <ul>
                 <li>

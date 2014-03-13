@@ -1,23 +1,25 @@
 <?php
 namespace Account\Controller;
 
+use Account\Entity\Account;
+use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use Zend\Authentication\AuthenticationService;
-use Account\Entity\Account;
 
 class AccountController extends AbstractActionController
 {
     const CONTROLLER_NAME = 'account_controller';
 
-    const ROUTE_LOGIN = 'account-login';
-    const ROUTE_REGISTER = 'account-register';
-    const ROUTE_AUTHENTICATE = 'account-authenticate';
+    const ROUTE_LOGIN = 'login';
+    const ROUTE_REGISTER = 'register';
+    const ROUTE_AUTHENTICATE = 'authenticate';
     const ROUTE_HOMEPAGE = 'home';
 
     const MESSAGE_ACCOUNT_CREATED = 'Your account has been created successfully!';
     const MESSAGE_INVALID_CREDENTIALS = 'The username/password combination is invalid.';
+    const MESSAGE_ALREADY_LOGGED = "You are already logged in!";
+    const MESSAGE_LOGOUT_TO_REGISTER = "You have to logout in order to register a new account!";
 
     /**
      * The login form.
@@ -75,23 +77,28 @@ class AccountController extends AbstractActionController
      */
     public function loginAction()
     {
-        $entity = new Account();
-        $loginForm = $this->getLoginForm();
-        $request = $this->getRequest();
-        $loginForm->bind($entity);
-        if ($request->isPost()) {
-            $data = $request->getPost();
-            $loginForm->setData($data);
-            if ($loginForm->isValid()) {
-                return $this->forward()->dispatch(static::CONTROLLER_NAME, array('action' => 'authenticate',
-                    'username' => $entity->getUsername(),
-                    'password' => $entity->getPassword(),
-                    'remember' => $data['account']['remember']));
+        if (!$this->identity()) {
+            $entity = new Account();
+            $loginForm = $this->getLoginForm();
+            $request = $this->getRequest();
+            $loginForm->bind($entity);
+            if ($request->isPost()) {
+                $data = $request->getPost();
+                $loginForm->setData($data);
+                if ($loginForm->isValid()) {
+                    return $this->forward()->dispatch(static::CONTROLLER_NAME, array('action' => 'authenticate',
+                        'username' => $entity->getUsername(),
+                        'password' => $entity->getPassword(),
+                        'remember' => $data['account']['remember']));
+                }
             }
+            return new ViewModel(array(
+                'form' => $loginForm,
+            ));
+        } else {
+            $this->flashMessenger()->addMessage($this->getTranslator()->translate(self::MESSAGE_ALREADY_LOGGED));
+            return $this->redirect()->toRoute(self::ROUTE_HOMEPAGE);
         }
-        return new ViewModel(array(
-            'form' => $loginForm,
-        ));
     }
 
     /**
@@ -115,23 +122,33 @@ class AccountController extends AbstractActionController
      */
     public function registerAction()
     {
-        $service = $this->getAccountService();
-        $request = $this->getRequest();
-        $form = $this->getRegisterForm();
-        $data = $request->getPost();
-        if ($request->isPost()) {
-            $account = $service->register($data);
-            if ($account) {
-                $this->flashMessenger()->addMessage($this->getTranslator()->translate(static::MESSAGE_ACCOUNT_CREATED));
-                return $this->forward()->dispatch(static::CONTROLLER_NAME, array('action' => 'authenticate',
-                        'username' => $account->getUsername(),
-                        'password' => $data['account']['password'])
-                );
+        if (!$this->identity()) {
+            $service = $this->getAccountService();
+            $request = $this->getRequest();
+            $form = $this->getRegisterForm();
+            $data = $request->getPost();
+            if ($request->isPost()) {
+                $account = $service->register($data);
+                if ($account) {
+                    $this->flashMessenger()->addMessage($this->getTranslator()->translate(static::MESSAGE_ACCOUNT_CREATED));
+                    return $this->forward()->dispatch(static::CONTROLLER_NAME, array('action' => 'authenticate',
+                            'username' => $account->getUsername(),
+                            'password' => $data['account']['password'])
+                    );
+                }else{
+                    if(\Account\Service\Account::$error){
+                        $this->flashMessenger()->addMessage(\Account\Service\Account::$error);
+                        return $this->redirect()->toRoute(self::ROUTE_REGISTER);
+                    }
+                }
             }
+            return new ViewModel(array(
+                'form' => $form,
+            ));
+        } else {
+            $this->flashMessenger()->addMessage($this->getTranslator()->translate(self::MESSAGE_LOGOUT_TO_REGISTER));
+            return $this->redirect()->toRoute(self::ROUTE_HOMEPAGE);
         }
-        return new ViewModel(array(
-            'form' => $form,
-        ));
     }
 
     /**
@@ -156,7 +173,9 @@ class AccountController extends AbstractActionController
                 $this->getAuthStorage()->setRememberMe(1);
                 $authService->setStorage($this->getAuthStorage());
             }
-            $authService->getStorage()->write($authResult->getIdentity());
+            $identity = $authResult->getIdentity();
+            $this->getAccountService()->updateLastSeen($identity,true);
+            $authService->getStorage()->write($identity);
         } else {
             $this->flashMessenger()->addMessage($this->getTranslator()->translate(self::MESSAGE_INVALID_CREDENTIALS));
             return $this->redirect()->toRoute(self::ROUTE_LOGIN);

@@ -8,6 +8,7 @@
 
 namespace Feed\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -48,6 +49,44 @@ class Youtuber {
      * @ORM\JoinColumn(name="game_id", referencedColumnName="game_id")
      */
     private $game;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Feed")
+     * @ORM\JoinTable(name="youtubers_feeds",
+     *      joinColumns={@ORM\JoinColumn(name="youtuber_id", referencedColumnName="youtuber_id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="feed_id", referencedColumnName="feed_id")}
+     *      )
+     */
+    private $feeds;
+
+    public function __construct(){
+        $this->feeds = new ArrayCollection();
+    }
+
+    public function addFeeds($feeds){
+        if(is_array($feeds)){
+            foreach($feeds as $feed)
+                $this->feeds->add($feed);
+        }else{
+            $this->feeds->add($feeds);
+        }
+    }
+
+    /**
+     * @param mixed $feeds
+     */
+    public function setFeeds($feeds)
+    {
+        $this->feeds = $feeds;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFeeds()
+    {
+        return $this->feeds;
+    }
 
     /**
      * @param mixed $game

@@ -8,16 +8,17 @@
 
 namespace Account\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class Account
  * @package Feed\Entity
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="\Account\Repository\AccountRepository")
  * @ORM\Table(name="accounts")
  */
-class Account {
+class Account
+{
 
     /**
      * @ORM\Id
@@ -62,11 +63,7 @@ class Account {
     private $firstSeen;
 
     /**
-     * @ORM\ManyToMany(targetEntity="\Feed\Entity\Feed", inversedBy="accounts")
-     * @ORM\JoinTable(name="accounts_feeds",
-     *      joinColumns={@ORM\JoinColumn(name="account_id", referencedColumnName="account_id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="feed_id", referencedColumnName="feed_id")}
-     *      )
+     * @ORM\OneToMany(targetEntity="AccountsHistory", mappedBy="account")
      */
     private $feeds;
 
@@ -104,12 +101,14 @@ class Account {
         return ($account->getPassword() === crypt($password . 'leetfeedpenbour', $account->getPassword()));
     }
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->feeds = new ArrayCollection();
         $this->ratings = new ArrayCollection();
     }
 
-    public function getLikedFeeds(){
+    public function getLikedFeeds()
+    {
         $liked = array();
         foreach ($this->ratings->toArray() as $rating)
             if ($rating->getRating() == 1) $liked[] = $rating->getFeed();
@@ -129,12 +128,12 @@ class Account {
         return null;
     }
 
-    public function hasWatched($feed){
-        $id = $feed->getVideoId();
-        if($this->feeds)
-            foreach($this->feeds as $watchedFeed){
-                if($watchedFeed->getVideoId() == $id) return true;
-            }
+    public function hasWatched($feed)
+    {
+        $id = $feed->getId();
+        foreach ($this->feeds as $watchedFeed) {
+            if ($watchedFeed->getFeed()->getFeedId() == $id) return true;
+        }
         return false;
     }
 
@@ -178,17 +177,18 @@ class Account {
         $this->feeds = $feeds;
     }
 
-    public function addFeeds($feeds){
-        if(is_array($feeds)){
-            foreach($feeds as $feed)
+    public function addFeeds($feeds)
+    {
+        if (is_array($feeds)) {
+            foreach ($feeds as $feed)
                 $this->feeds->add($feed);
-        }else{
+        } else {
             $this->feeds->add($feeds);
         }
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getFeeds()
     {
@@ -292,5 +292,4 @@ class Account {
     }
 
 
-
-} 
+}

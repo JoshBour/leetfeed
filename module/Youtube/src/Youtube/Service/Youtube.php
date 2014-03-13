@@ -6,67 +6,96 @@
  * Time: 6:51 μμ
  */
 
-namespace Feed\Model;
+namespace Youtube\Service;
 
-use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Youtube\Model\Channel;
+use Youtube\Model\Video;
 use Zend\ServiceManager\ServiceManager;
-use Doctrine\ORM\EntityManager;
-use Feed\Model\YoutubeEntry;
-use Doctrine\ORM\EntityRepository;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 class Youtube implements ServiceManagerAwareInterface
 {
+    /**
+     * @var \Google_Service_YouTube
+     */
     private $youtube;
 
+    /**
+     * @var ServiceManager
+     */
     private $serviceManager;
-
-    private $entityManager;
 
     public function __construct()
     {
         $client = new \Google_Client();
         $client->setApplicationName("Leetfeed");
-        $client->setDeveloperKey($this->getServiceManager()->get('Config')["youtube"]["api_key"]);
+        $client->setDeveloperKey("AIzaSyBSvLVzCvRyhf4wXYwFo0Otudl86GBeyFM");
         $this->youtube = new \Google_Service_YouTube($client);
     }
 
-    public function findVideoById($id){
-        $videoList = $this->youtube->videos->listVideos("id,snippet,statistics",array(
-         "id" => $id
-        ));
-        $video = $videoList['items'][0];
-        return new YoutubeEntry($video);
-    }
-
-    public function findChannelByUsername($username){
-        $channelList = $this->youtube->channels->listChannels("id,snippet",array(
-            "forUsername" => $username
-        ));
-        return $channelList['items'][0];
-
-    }
-
-    /**
-     * Retrieve the doctrine entity manager
-     *
-     * @return \Doctrine\ORM\EntityManager
-     */
-    public function getEntityManager(){
-        if(null === $this->entityManager){
-            $this->entityManager = $this->getServiceManager()->get('Doctrine\ORM\EntityManager');
+    public function findByQuery($query,$extraParams = null,$maxResults = 50, $time = "this_month", $nextPageToken = "")
+    {
+        if ($time == "this_month") {
+            $datetime = new \DateTime("-1 month");
+            $time = $datetime->format(\DateTime::RFC3339);
+        } else if ($time == "this_week") {
+            $datetime = new \DateTime("-1 week");
+            $time = $datetime->format(\DateTime::RFC3339);
         }
-        return $this->entityManager;
+        $options = array(
+            "type" => "video",
+            "maxResults" => $maxResults,
+            "publishedAfter" => $time,
+        );
+        if($query != null) $options["q"] = $query;
+        if($extraParams) $options = array_merge($options,$extraParams);
+        if ($nextPageToken) $options["pageToken"] = $nextPageToken;
+        $response = $this->youtube->search->listSearch("snippet", $options);
+        $videos = array();
+        foreach ($response["items"] as $result)
+            $videos[] = new Video($result, "searchItem");
+        return $videos;
     }
 
-    /**
-     * Set the doctrine entity manager
-     *
-     * @param EntityManager $entityManager
-     * @return Account
-     */
-    public function setEntityManager(EntityManager $entityManager){
-        $this->entityManager = $entityManager;
-        return $this;
+    public function findRelatedToId($id)
+    {
+        return $this->findByQuery(null,array("relatedToVideoId"=>$id));
+    }
+
+    public function findVideoById($id)
+    {
+        $videoList = $this->youtube->videos->listVideos("id,snippet,statistics,contentDetails", array(
+            "id" => $id,
+        ));
+        return new Video($videoList['items'][0]);
+    }
+
+    public function findPlaylistById($id,$maxResults = 50){
+        $playlistItems = $this->youtube->playlistItems->listPlaylistItems('snippet',array(
+            'playlistId' => $id,
+            'maxResults' => $maxResults
+        ));
+        $videos = array();
+        foreach($playlistItems["items"] as $item)
+            $videos[] = new Video($item, "playlistItem");
+        return $videos;
+    }
+
+    public function findChannelById($id)
+    {
+        $channelList = $this->youtube->channels->listChannels("id,snippet,statistics,contentDetails", array(
+            "id" => $id,
+        ));
+        return new Channel($channelList['items'][0]);
+    }
+
+    public function findChannelByUsername($username)
+    {
+        $channelList = $this->youtube->channels->listChannels("id,snippet,statistics,contentDetails", array(
+            "forUsername" => $username,
+        ));
+        return new Channel($channelList['items'][0]);
+
     }
 
     /**
@@ -83,7 +112,7 @@ class Youtube implements ServiceManagerAwareInterface
      * Set service manager instance
      *
      * @param ServiceManager $serviceManager
-     * @return Account
+     * @return Youtube
      */
     public function setServiceManager(ServiceManager $serviceManager)
     {

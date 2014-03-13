@@ -1,6 +1,15 @@
 <div id="main">
     <div id="history" class="module">
         <h1>History</h1>
+        <div id="historySort">
+            <select>
+                <option<?php echo ($sort == 'now') ? ' selected="selected"':'';?> value="<?php echo $this->url('history',array("sort"=>"now")); ?>">Today</option>
+                <option<?php echo ($sort == 'yesterday') ? ' selected="selected"':'';?>  value="<?php echo $this->url('history',array("sort"=>"yesterday")); ?>">Yesterday</option>
+                <option<?php echo ($sort == 'week') ? ' selected="selected"':'';?>  value="<?php echo $this->url('history',array("sort"=>"week")); ?>">This Week</option>
+                <option<?php echo ($sort == 'month') ? ' selected="selected"':'';?>  value="<?php echo $this->url('history',array("sort"=>"month")); ?>">This Month</option>
+                <option<?php echo ($sort == 'all') ? ' selected="selected"':'';?>  value="<?php echo $this->url('history',array("sort"=>"all")); ?>">All Time</option>
+            </select>
+        </div>
         <?php if($feeds->count() > 0){ ?>
         <ul class="verticalFeedList">
             <?php
@@ -10,7 +19,7 @@
             ?>
         </ul>
         <?php }else{ ?>
-            You haven't watched any feeds yet.
+            <p>You haven't watched any feeds during the selected time period.</p>
         <?php } ?>
     </div>
 </div>

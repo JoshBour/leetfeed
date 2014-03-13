@@ -1,5 +1,5 @@
 <?php
-namespace Application;
+namespace Account;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;

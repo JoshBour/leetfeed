@@ -9,6 +9,10 @@ use Doctrine\ORM\EntityRepository;
 
 class Account implements ServiceManagerAwareInterface{
 
+    public static $error = null;
+
+    private $account;
+
     /**
      * var EntityManager
      */
@@ -31,11 +35,19 @@ class Account implements ServiceManagerAwareInterface{
 
     public function register($data){
         $form = $this->getRegisterForm();
-        $account = $this->getActiveAccount();
+        $account = new \Account\Entity\Account();
+        $disabledUsernames = $this->getServiceManager()->get('Config')['disabled_usernames'];
+
 
         $form->bind($account);
         $form->setData($data);
         if(!$form->isValid()){
+            return false;
+        }
+        $account->setIp($_SERVER["REMOTE_ADDR"]);
+        $account->setFirstSeen(date("Y-m-d H:i:s", time()));
+        if(in_array(strtolower($account->getUsername()),$disabledUsernames)){
+            self::$error = "The username is not allowed, please select a new one.";
             return false;
         }
         $account->setPassword(\Account\Entity\Account::getHashedPassword($account->getPassword()));
@@ -50,30 +62,13 @@ class Account implements ServiceManagerAwareInterface{
         }
     }
 
-    /**
-     * @return bool|\Account\Entity\Account|null|object
-     */
-    public function getActiveAccount(){
-        $session = new \Zend\Session\Container('account');
-        $ip = $_SERVER["REMOTE_ADDR"];
-        if(isset($session->accountId)){
-            $account = $this->getAccountRepository()->find($session->accountId);
-        }else{
-            $account = $this->getAccountRepository()->findOneBy(array('ip' => $ip));
-        }
-        if($account){
-            if($account->getIp() != $ip){
-                $account->setIp($ip);
-            }
-        }else{
-            $account = $this->create($ip);
-        }
-        $session->accountId = $account->getAccountId();
-        return $account;
-    }
-
-    public function updateLastSeen(&$account){
+    public function updateLastSeen(&$account,$flush = false){
         $account->setLastSeen(date("Y-m-d H:i:s", time()));
+        if($flush){
+            $em = $this->getEntityManager();
+            $em->persist($account);
+            $em->flush();
+        }
     }
 
     public function create($ip){
@@ -88,6 +83,17 @@ class Account implements ServiceManagerAwareInterface{
         }catch (\Exception $e){
             return false;
         }
+    }
+
+    /**
+     * Retrieve the account plugin
+     *
+     * @return \Account\Plugin\ActiveAccount
+     */
+    public function getAccount(){
+        if(null === $this->account)
+            $this->account = $this->getServiceManager()->get('ControllerPluginManager')->get('account')->getActiveAccount();
+        return $this->account;
     }
 
     public function getRegisterForm(){
@@ -151,4 +157,5 @@ class Account implements ServiceManagerAwareInterface{
             $this->accountRepository = $this->getEntityManager()->getRepository('\Account\Entity\Account');
         return $this->accountRepository;
     }
+
 } 

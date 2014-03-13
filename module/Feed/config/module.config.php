@@ -1,114 +1,144 @@
 <?php
-namespace Application;
+namespace Feed;
 
 use \Zend\InputFilter\InputFilter;
 
 return array(
+    'doctrine' => array(
+        'driver' => array(
+            'entity' => array(
+                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'paths' => array(__DIR__ . '/../src/' . __NAMESPACE__ . '/Entity'),
+            ),
+            'orm_default' => array(
+                'drivers' => array(
+                    __NAMESPACE__ . '\Entity' => 'entity',
+                ),
+            ),
+        ),
+    ),
     'router' => array(
         'routes' => array(
-            'home' => array(
-                'type' => 'Zend\Mvc\Router\Http\Literal',
+            'rate' => array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route'    => '/',
+                    'route'    => '/feed/rate/:rating/id/:id',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\Index',
-                        'action'     => 'index',
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'rate',
+                    ),
+                    'constraints' => array(
+                        'id' => '[0-9]+',
+                        'rating' => 'thumbUp|thumbDown'
                     ),
                 ),
             ),
-            'faq' => array(
-                'type' => 'Zend\Mvc\Router\Http\Literal',
+            'view' => array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route'    => '/faq',
+                    'route'    => '/feed/:feedId',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\Index',
-                        'action'     => 'faq',
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'view',
+                    ),
+                    'constraints' => array(
+                        'feedId' => '[0-9]+',
                     ),
                 ),
             ),
-            'promote' => array(
-                'type' => 'Zend\Mvc\Router\Http\Literal',
+            'history' => array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route'    => '/promote',
+                    'route'    => '/history[/:sort]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\Index',
-                        'action'     => 'promote',
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'history',
+                        'sort' => 'now'
                     ),
                 ),
             ),
-//            'about' => array(
-//                'type' => 'Zend\Mvc\Router\Http\Literal',
-//                'options' => array(
-//                    'route'    => '/about',
-//                    'defaults' => array(
-//                        'controller' => 'Application\Controller\Index',
-//                        'action'     => 'about',
-//                    ),
-//                ),
-//            ),
-            'contact' => array(
+            'random' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/contact',
+                    'route'    => '/random',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\Index',
-                        'action'     => 'contact',
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'random',
+                    ),
+                ),
+            ),
+            'famous' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/famous',
+                    'defaults' => array(
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'famous',
+                    ),
+                ),
+            ),
+            'leet' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/leet',
+                    'defaults' => array(
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'leet',
+                    ),
+                ),
+            ),
+            'get-random-feed' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/get-random-feed',
+                    'defaults' => array(
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'get-random-feed',
+                    ),
+                ),
+            ),
+            'add-to-watched' => array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route'    => '/feed/add-to-watched/:feedId',
+                    'defaults' => array(
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'add-to-watched',
+                    ),
+                ),
+            ),
+            'get-youtuber-feeds' => array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route'    => '/get-youtuber-feeds/:youtuberName',
+                    'defaults' => array(
+                        'controller' => 'Feed\Controller\Feed',
+                        'action'     => 'get-youtuber-feeds',
                     ),
                 ),
             ),
         ),
     ),
     'service_manager' => array(
-        'factories' => array(
-            'contact_form' => function ($sm) {
-                    $fieldset = new Form\ContactFieldset($sm->get('translator'));
-                    $form = new Form\ContactForm();
-
-                    $form->add($fieldset)
-                        ->setInputFilter(new InputFilter());
-                    return $form;
-                },
-        ),
-//        'abstract_factories' => array(
-//            'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-//            'Zend\Log\LoggerAbstractServiceFactory',
-//        ),
-        'aliases' => array(
-            'translator' => 'MvcTranslator',
-        ),
-    ),
-    'translator' => array(
-        'locale' => 'en_US',
-        'translation_file_patterns' => array(
-            array(
-                'type'     => 'gettext',
-                'base_dir' => __DIR__ . '/../language',
-                'pattern'  => '%s.mo',
-            ),
+        'invokables' => array(
+                'feed_service' => 'Feed\Service\Feed',
+                'generator' => 'Feed\Model\FeedGenerator',
         ),
     ),
     'controllers' => array(
         'invokables' => array(
-            'Application\Controller\Index' => 'Application\Controller\IndexController'
+            'Feed\Controller\Feed' => 'Feed\Controller\FeedController'
         ),
     ),
     'view_manager' => array(
-        'display_not_found_reason' => true,
-        'display_exceptions'       => true,
-        'doctype'                  => 'HTML5',
-        'not_found_template'       => 'error/404',
-        'exception_template'       => 'error/index',
-        'template_map' => array(
-            'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
-            'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
-            'error/404'               => __DIR__ . '/../view/error/404.phtml',
-            'error/index'             => __DIR__ . '/../view/error/index.phtml',
-        ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
         ),
         'strategies' => array(
             'ViewJsonStrategy'
-        )
+        ),
+        'template_map' => array(
+            'feed' => __DIR__ . '/../view/feed/partial/feed.phtml'
+        ),
     ),
 );

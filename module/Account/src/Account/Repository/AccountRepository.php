@@ -6,7 +6,7 @@
  * Time: 1:12 μμ
  */
 
-namespace Application\Repository;
+namespace Account\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\ResultSetMapping;
@@ -15,6 +15,6 @@ use Zend\Paginator\Adapter\ArrayAdapter;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 
-class AccountRepository {
+class AccountRepository extends EntityRepository{
 
 } 

@@ -41,58 +41,60 @@ class FeedGenerator implements ServiceManagerAwareInterface
         $this->startIndex = -49;
     }
 
-    public function getRisingFeeds($requiredFeeds)
-    {
-        $feedRepository = $this->getFeedRepository();
-        $risingFeeds = $feedRepository->findBy(array("isRising" => "1"));
-        $feedNum = count($risingFeeds);
-        $em = $this->getEntityManager();
-        $game = $this->getGameRepository()->find(1);
-        $startIndex = 1;
-        $count = 0;
-        $i = 0;
-        if ($feedNum < $requiredFeeds) {
-            do {
-                $videoFeed = $this->getFeedsByQuery(50, "this_week", $startIndex);
-                foreach ($videoFeed as $video) {
-                    if ($feed = $feedRepository->findOneBy(array("videoId" => $video->getVideoId()))) {
-                        if ($feed->getIsRising() == 1) continue;
-                        $feed->setIsRising(1);
-                    } else {
-                        $entry = new YoutubeEntry($video);
-                        $feed = \Feed\Entity\Feed::create($game,
-                            $entry->getVideoId(),
-                            $entry->getTitle(),
-                            $entry->getAuthor(),
-                            $entry->getDescription(), 1, 0);
-                    }
-                    $em->persist($feed);
-                    $risingFeeds[] = $feed;
-                    $count++;
-                }
-                $startIndex+=50;
-            } while ($count < $requiredFeeds - $feedNum);
-        }
-        return $risingFeeds;
-    }
+//    public function getRisingFeeds($requiredFeeds)
+//    {
+//        $feedRepository = $this->getFeedRepository();
+//        $risingFeeds = $feedRepository->findBy(array("isRising" => "1"));
+//        $feedNum = count($risingFeeds);
+//        $em = $this->getEntityManager();
+//        $game = $this->getGameRepository()->find(1);
+//        $startIndex = 1;
+//        $count = 0;
+//        $i = 0;
+//        if ($feedNum < $requiredFeeds) {
+//            do {
+//                $videoFeed = $this->getFeedsByQuery(50, "this_week", $startIndex);
+//                foreach ($videoFeed as $video) {
+//                    if ($feed = $feedRepository->findOneBy(array("videoId" => $video->getVideoId()))) {
+//                        if ($feed->getIsRising() == 1) continue;
+//                        $feed->setIsRising(1);
+//                    } else {
+//                        $entry = new YoutubeEntry($video);
+//                        $feed = \Feed\Entity\Feed::create($game,
+//                            $entry->getVideoId(),
+//                            $entry->getTitle(),
+//                            $entry->getAuthor(),
+//                            $entry->getDescription(), 1, 0);
+//                    }
+//                    $em->persist($feed);
+//                    $risingFeeds[] = $feed;
+//                    $count++;
+//                }
+//                $startIndex+=50;
+//            } while ($count < $requiredFeeds - $feedNum);
+//        }
+//        return $risingFeeds;
+//    }
 
-    public function getRelatedFeeds($url, $game = 1)
+    public function getRelatedFeeds($id, $game = 1)
     {
         $em = $this->getEntityManager();
-        $yt = $this->getYoutubeService()->getYoutubeInstance();
+        $yt = $this->getYoutubeService();
         $feedRepository = $this->getFeedRepository();
-        $game = $this->getGameRepository()->find(1);
-        $videoFeeds = $yt->getRelatedVideoFeed($url);
+        $game = $this->getGameRepository()->find($game);
+        $videoFeeds = $yt->findRelatedToId($id);
         $feedList = array();
         $flush = false;
+        /**
+         * @var $video \Youtube\Model\Video
+         */
         foreach ($videoFeeds as $video) {
-            $entry = new YoutubeEntry($video);
-            if (!$feed = $feedRepository->findOneBy(array("videoId" => $entry->getVideoId()))) {
+            if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
                 $feed = \Feed\Entity\Feed::create($game,
-                    $entry->getVideoId(),
-                    $entry->getTitle(),
-                    $entry->getAuthor(),
-                    $entry->getDescription(), 1, 0);
+                    $video->getId(),
+                    $video->getTitle(),
+                    $video->getChannel()->getTitle(),
+                    $video->getDescription(), 1, 0);
                 $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
                 if (!$isPersisted) $em->persist($feed);
                 $flush = true;
@@ -113,33 +115,39 @@ class FeedGenerator implements ServiceManagerAwareInterface
         $game = $this->getGameRepository()->find($gameId);
 
         // select a random one from the above list
-        do {
-            $randFeed = $feeds[rand(0, count($feeds) - 1)];
-        } while ($randFeed == null);
-
-        $entry = new YoutubeEntry($randFeed);
+        /**
+         * @var $randFeed \Youtube\Model\Video
+         */
+        $randFeed = $feeds[rand(0, count($feeds) - 1)];
         $checkedFeeds = array();
         // while the account has seen the feed, search for an other one
-        while ($account->hasWatched($entry)) {
-            if (count($checkedFeeds) == count($feeds)) {
-                $checkedFeeds = array();
-                $feeds = $this->getRandomFeedList();
+        if($account){
+            while ($account->hasWatched($randFeed)) {
+                if (count($checkedFeeds) == count($feeds)) {
+                    $checkedFeeds = array();
+                    $feeds = $this->getRandomFeedList();
+                }
+                if (!in_array($randFeed, $checkedFeeds)) $checkedFeeds[] = $randFeed;
+                $randFeed = $feeds[rand(0, count($feeds) - 1)];
             }
-            if (!in_array($entry, $checkedFeeds)) $checkedFeeds[] = $entry;
-            $entry = new YoutubeEntry($feeds[rand(0, count($feeds) - 1)]);
         }
 
         // save the feed to accounts feeds
         $added = false;
-        if(!$feed = $feedRepository->findOneBy(array("videoId"=>$entry->getVideoId()))){
-            $feed = \Feed\Entity\Feed::create($game, $entry->getVideoId(), $entry->getTitle(), $entry->getAuthor(), $entry->getDescription());
+        if(!$feed = $feedRepository->findOneBy(array("videoId"=>$randFeed->getId()))){
+            $feed = \Feed\Entity\Feed::create($game, $randFeed->getId(), $randFeed->getTitle(), $randFeed->getChannel()->getTitle(), $randFeed->getDescription());
             $added = true;
             $em->persist($feed);
         }
-        $account->addFeeds($feed);
-        $em->persist($account);
+        if($account){
+            $this->getFeedService()->addFeedToWatched($feed->getFeedId());
+//            $watchedFeed = \Account\Entity\AccountsHistory::create($account,$feed);
+//            $account->addFeeds($watchedFeed);
+//            $em->persist($watchedFeed);
+//            $em->persist($account);
+        }
         $em->flush();
-        return $added ? $feedRepository->findOneBy(array("videoId"=>$entry->getVideoId())) : $feed;
+        return $added ? $feedRepository->findOneBy(array("videoId"=>$randFeed->getId())) : $feed;
     }
 
     private function getRandomFeedList()
@@ -147,47 +155,18 @@ class FeedGenerator implements ServiceManagerAwareInterface
         if (rand(1, 10) < 5) {
             $youtubers = $this->getYoutuberRepository()->findAll();
             $youtuber = $youtubers[rand(0, count($youtubers) - 1)];
-            $feeds = $this->getFeedsByYoutuber($youtuber);
+            $feeds = $this->getYoutubeService()->findChannelByUsername($youtuber->getName())->getUploads();
         } else {
             $this->startIndex += 50;
-            $feeds = $this->getFeedsByQuery();
+            $feeds = $this->getYoutubeService()->findByQuery("League of legends game");
         }
         return $feeds;
-    }
-
-
-    /**
-     * @param int $maxResults
-     * @param string $time
-     * @param int $index
-     * @return \ZendGData\YouTube\VideoFeed
-     */
-    private function getFeedsByQuery($maxResults = 50, $time = "this_month", $index = 1)
-    {
-        $yt = $this->getYoutubeService()->getYoutubeInstance();
-        $query = $yt->newVideoQuery();
-        $query->setOrderBy('viewCount')
-            ->setStartIndex($index)
-            ->setTime($time)
-            ->setMaxResults($maxResults)
-            ->setVideoQuery("League of legends game");
-        return $yt->getVideoFeed($query);
-    }
-
-    /**
-     * @param $youtuber
-     * @return \ZendGData\YouTube\VideoFeed
-     */
-    private function getFeedsByYoutuber($youtuber)
-    {
-        $yt = $this->getYoutubeService()->getYoutubeInstance();
-        return $yt->getUserUploads($youtuber->getName());
     }
 
     /**
      * Retrieve the youtube service.
      *
-     * @return \Feed\Service\Youtube
+     * @return \Youtube\Service\Youtube
      */
     public function getYoutubeService()
     {
@@ -239,7 +218,7 @@ class FeedGenerator implements ServiceManagerAwareInterface
     public function getAccount()
     {
         if (null === $this->account) {
-            $this->account = $this->getServiceManager()->get('account_service')->getActiveAccount();
+            $this->account = $this->getServiceManager()->get('ControllerPluginManager')->get('account')->getAccount();
         }
         return $this->account;
     }

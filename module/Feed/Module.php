@@ -1,5 +1,5 @@
 <?php
-namespace Application;
+namespace Feed;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;

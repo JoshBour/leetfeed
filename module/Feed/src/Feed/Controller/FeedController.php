@@ -37,29 +37,75 @@ class FeedController extends AbstractActionController
 
     private $youtubeService;
 
+
+    public function randomAction()
+    {
+        return new ViewModel(array(
+            "includeProgressBar" => true
+        ));
+    }
+
+    public function getRandomFeedAction()
+    {
+     #   if ($this->getRequest()->isXmlHttpRequest()) {
+            $generator = $this->getGenerator();
+            $feed = $generator->getRandomFeed();
+            $feedId = $feed->getFeedId();
+            return new JsonModel(array(
+                "feedId" => $feedId
+            ));
+      #  } else {
+     #       $this->getResponse()->setStatusCode(404);
+      #      return;
+     #   }
+    }
+
+    public function addToWatchedAction()
+    {
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $feedId = $this->params()->fromRoute("feedId");
+            $feed = $this->getFeedService()->addFeedToWatched($feedId);
+            $success = 0;
+            $message = '';
+            if ($feed) {
+                $success = 1;
+            } else {
+                $message = "There was an error when storing the feed.";
+            }
+            return new JsonModel(array(
+                "success" => $success,
+                "message" => $message
+            ));
+        } else {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+    }
+
     public function famousAction()
     {
-        $youtubers = $this->getYoutuberRepository()->findBy(array(),array("igName" => "ASC"));
-        $rand = rand(0,count($youtubers)-1);
+        $youtubers = $this->getYoutuberRepository()->findBy(array(), array("igName" => "ASC"));
+        $rand = rand(0, count($youtubers) - 1);
         $randomYoutuber = $youtubers[$rand];
-        $feeds = $this->getYoutubeService()->getYoutuberUploads($randomYoutuber->getName());
+        $feeds = $this->getFeedService()->getYoutuberUploads($randomYoutuber);
 
         return new ViewModel(array(
             "youtubers" => $youtubers,
-            "feeds" =>  $feeds,
+            "feeds" => $feeds,
             "randomYoutuber" => $randomYoutuber));
     }
 
-    public function getYoutuberFeedsAction(){
+    public function getYoutuberFeedsAction()
+    {
         $request = $this->getRequest();
-        if($request->isXmlHttpRequest()){
+        if ($request->isXmlHttpRequest()) {
             $youtuberName = $this->params()->fromRoute("youtuberName");
-            $feeds = $this->getYoutubeService()->getYoutuberUploads($youtuberName);
+            $feeds = $this->getFeedService()->getYoutuberUploads($this->getYoutuberRepository()->findOneBy(array('name' => $youtuberName)));
             $view = new ViewModel();
             $view->setVariable("feeds", $feeds);
             $view->setTerminal(true);
             return $view;
-        }else{
+        } else {
             $this->getResponse()->setStatusCode(404);
             return;
         }
@@ -67,13 +113,24 @@ class FeedController extends AbstractActionController
 
     public function leetAction()
     {
-        $account = $this->user();
+        if (!$this->identity()) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+        $account = $this->account();
         return new ViewModel(array("feeds" => $account->getLikedFeeds()));
     }
 
-    public function historyAction(){
-        $account = $this->user();
-        return new ViewModel(array("feeds" => $account->getFeeds()));
+    public function historyAction()
+    {
+        if (!$this->identity()) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+        $sort = $this->params()->fromRoute("sort");
+        $account = $this->account();
+        $feeds = $this->getFeedRepository()->findFeedsByDate($account,$sort);
+        return new ViewModel(array("feeds" => $feeds,"sort" => $sort));
     }
 
     public function viewAction()
@@ -82,17 +139,18 @@ class FeedController extends AbstractActionController
         if ($feedId) {
             $feed = $this->getFeedRepository()->find($feedId);
             if ($feed) {
-                if($feed->getIsRelated() == 1){
+                if ($feed->getIsRelated() == 1) {
                     $em = $this->getEntityManager();
                     $feed->setIsRelated(0);
                     $em->persist($feed);
                     $em->flush();
                 }
+                if($this->identity()) $this->getFeedService()->addFeedToWatched($feedId);
                 $related = $this->getGenerator()->getRelatedFeeds($feed->getVideoId());
                 $ogTags = $feed->getOgTags();
                 return new ViewModel(array(
                     "feed" => $feed,
-                    "account" => $this->user(),
+                    "account" => $this->account(),
                     'ogTags' => $ogTags,
                     "pageTitle" => $feed->getTitle(),
                     "relatedFeeds" => $related));
@@ -143,7 +201,7 @@ class FeedController extends AbstractActionController
     }
 
     /**
-     * @return \Feed\Service\Youtube
+     * @return \Youtube\Service\Youtube
      */
     public function getYoutubeService()
     {
@@ -188,7 +246,7 @@ class FeedController extends AbstractActionController
     /**
      * Retrieve the account repository
      *
-     * @return EntityRepository
+     * @return \Feed\Repository\FeedRepository
      */
     public function getFeedRepository()
     {

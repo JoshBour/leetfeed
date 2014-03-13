@@ -41,35 +41,87 @@ class Feed implements ServiceManagerAwareInterface{
      */
     private $gameRepository;
 
+    /**
+     * @var \Youtube\Service\Youtube
+     */
+    private $youtubeService;
 
-    public function saveFeedList($feedList, $limit = null, $flush = false){
-        $count = 0;
+    /**
+     * @var EntityRepository
+     */
+    private $watchedFeedRepository;
+
+    public function getYoutuberUploads($youtuber){
+        $feeds = $youtuber->getFeeds();
+        $channel = $this->getYoutubeService()->findChannelByUsername($youtuber->getName());
+        $feedRepository = $this->getFeedRepository();
         $game = $this->getGameRepository()->find(1);
         $em = $this->getEntityManager();
-        $relatedFeeds = array();
-        foreach ($feedList as $ytFeed) {
-            if(!is_null($limit) && $count > $limit) break;
-            $entry = new \Feed\Model\YoutubeEntry($ytFeed);
-            $feed = \Feed\Entity\Feed::create($game,
-                $entry->getVideoId(),
-                $entry->getTitle(),
-                $entry->getAuthor(),
-                $entry->getDescription(),1);
-            $relatedFeeds[] = $feed;
-            $em->persist($feed);
-            $count++;
+        $flush = false;
+        $persistYoutuber = false;
+        $uploads = $channel->getUploads();
+
+        if(count($feeds) != count($uploads)){
+            $feeds = array();
+            /**
+             * @var $video \Youtube\Model\Video
+             */
+            foreach($uploads as $video){
+                if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
+                    $feed = \Feed\Entity\Feed::create($game,
+                        $video->getId(),
+                        $video->getTitle(),
+                        $channel->getTitle(),
+                        $video->getDescription(),1,0);
+                    $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
+                    if(!$isPersisted) $em->persist($feed);
+                    $flush = true;
+                }
+                if(!in_array($feed,$feeds)){
+                    $feeds[] = $feed;
+                    $youtuber->addFeeds($feed);
+                    $persistYoutuber = true;
+                }
+            }
+            if($persistYoutuber) $em->persist($youtuber);
+            if($flush) $em->flush();
         }
-        if($flush) $em->flush();
-        return $relatedFeeds;
+        return $feeds;
     }
 
-    public function createFromEntry($entry,$related = 0, $flush = true){
+    /**
+     * @param \Youtube\Model\Video $video
+     * @param int $related
+     * @param bool $flush
+     * @return \Feed\Entity\Feed
+     */
+    public function createFromEntry($video,$related = 0, $flush = true){
         $game = $this->getGameRepository()->find(1);
         // save the feed to accounts feeds
-        $feed = new \Feed\Model\YoutubeEntry($entry);
-        $accountFeed = \Feed\Entity\Feed::create($game, $feed->getVideoId(), $feed->getTitle(), $feed->getAuthor(), $feed->getDescription(),$related);
+        $accountFeed = \Feed\Entity\Feed::create($game, $video->getId(), $video->getTitle(), $video->getChannel()->getTitle(), $video->getDescription(),$related);
         $this->getEntityManager()->persist($accountFeed);
         return $accountFeed;
+    }
+
+    /**
+     * @param int $feedId
+     * @return bool
+     */
+    public function addFeedToWatched($feedId){
+        $feed = $this->getFeedRepository()->find($feedId);
+        if ($feed) {
+            $em = $this->getEntityManager();
+            $account = $this->getAccountPlugin()->getAccount();
+            if (!$this->getWatchedFeedRepository()->findOneBy(array("feed"=>$feed,"account"=>$account))) {
+                $watchedFeed = \Account\Entity\AccountsHistory::create($account,$feed);
+                $account->addFeeds($watchedFeed);
+                $em->persist($watchedFeed);
+                $em->persist($account);
+                $em->flush();
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -113,6 +165,31 @@ class Feed implements ServiceManagerAwareInterface{
         }
     }
 
+
+    /**
+     * Retrieve the account repository
+     *
+     * @return EntityRepository
+     */
+    public function getWatchedFeedRepository()
+    {
+        if (null === $this->watchedFeedRepository)
+            $this->watchedFeedRepository = $this->getEntityManager()->getRepository('\Account\Entity\AccountsHistory');
+        return $this->watchedFeedRepository;
+    }
+
+    /**
+     * Retrieve the youtube service.
+     *
+     * @return \Youtube\Service\Youtube
+     */
+    public function getYoutubeService()
+    {
+        if (null === $this->youtubeService)
+            $this->youtubeService = $this->getServiceManager()->get('youtube_service');
+        return $this->youtubeService;
+    }
+
     /**
      * Retrieve the doctrine entity manager
      *
@@ -129,7 +206,7 @@ class Feed implements ServiceManagerAwareInterface{
      * Set the doctrine entity manager
      *
      * @param EntityManager $entityManager
-     * @return Account
+     * @return Feed
      */
     public function setEntityManager(EntityManager $entityManager){
         $this->entityManager = $entityManager;
@@ -150,7 +227,7 @@ class Feed implements ServiceManagerAwareInterface{
      * Set service manager instance
      *
      * @param ServiceManager $serviceManager
-     * @return Account
+     * @return Feed
      */
     public function setServiceManager(ServiceManager $serviceManager)
     {
@@ -178,7 +255,7 @@ class Feed implements ServiceManagerAwareInterface{
      */
     public function getAccountPlugin(){
         if(null === $this->accountPlugin)
-            $this->accountPlugin = $this->getServiceManager()->get('ControllerPluginManager')->get('user');
+            $this->accountPlugin = $this->getServiceManager()->get('ControllerPluginManager')->get('account');
         return $this->accountPlugin;
     }
 

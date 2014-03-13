@@ -10,14 +10,14 @@ class ContactFieldset extends Fieldset implements InputFilterProviderInterface
     const PLACEHOLDER_SUBJECT = 'Enter the subject..';
     const PLACEHOLDER_BODY = 'Enter your message..';
 
-    const LABEL_SENDER = 'From:';
+    const LABEL_SENDER = 'From (Email):';
     const LABEL_SUBJECT = 'Subject:';
     const LABEL_BODY = 'Body:';
 
     const ERROR_SUBJECT_EMPTY = "The subject can't be empty.";
     const ERROR_SUBJECT_INVALID_LENGTH = "The subject length must be between between 10-30 characters long.";
     const ERROR_BODY_EMPTY = "The body can't be empty.";
-    const ERROR_BODY_INVALID_LENGTH = "The body length must be between between 20-150 characters long.";
+    const ERROR_BODY_INVALID_LENGTH = "The body length must be at least 50 characters long.";
     const ERROR_SENDER_EMPTY = "The sender email can't be empty.";
     const ERROR_SENDER_INVALID = "The sender email is invalid.";
 
@@ -113,10 +113,9 @@ class ContactFieldset extends Fieldset implements InputFilterProviderInterface
                         'name' => 'StringLength',
                         'break_chain_on_failure' => true,
                         'options' => array(
-                            'min' => 20,
-                            'max' => 150,
+                            'min' => 50,
                             'messages' => array(
-                                \Zend\Validator\StringLength::INVALID => $this->translator->translate(self::ERROR_BODY_INVALID_LENGTH)
+                                \Zend\Validator\StringLength::TOO_SHORT => $this->translator->translate(self::ERROR_BODY_INVALID_LENGTH)
                             )
                         )
                     ),

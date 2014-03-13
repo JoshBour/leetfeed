@@ -1,11 +1,11 @@
 <div id="main">
     <div id="register" class="module semiTransparentBackground">
         <h1>Register</h1>
-        <img class="centeredImage" src="<?php echo $this->basePath() . '../images/leetfeed-medium.png'; ?>" alt="<?php echo $this->translate("Leetfeed Logo"); ?>"/>
+        <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>" alt="<?php echo $this->translate("Leetfeed Logo"); ?>"/>
         <p>It's really easy! Just fill in your username, password, email and you are ready to go!</p>
         <?php
         $form->prepare();
-        $form->setAttribute('action', $this->url('account-register'));
+        $form->setAttribute('action', $this->url('register'));
         $fieldset = $form->get('account');
 
         echo $this->form()->openTag($form);
@@ -42,6 +42,6 @@
 
         <?php echo $this->form()->closeTag() ?>
 
-        <p>Already have an account? Click <a href="<?php echo $this->url('account-login'); ?>">here to login</a></p>
+        <p>Already have an account? Click <a href="<?php echo $this->url('login'); ?>">here to login</a></p>
     </div>
 </div>

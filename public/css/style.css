@@ -81,9 +81,9 @@
 
     strong {font-weight: bold;}
 
-    a {color: #405B65; text-decoration: none;}
+    a {color: #648C9C; text-decoration: none;}
     /*a:visited {color: #000;} */
-    a:hover {text-decoration: underline; color: #6F9EB0;}
+    a:hover {text-decoration: underline; color: #8AC0D4;}
 
     input, select, textarea {
         width:505px;
@@ -97,7 +97,6 @@
     }
 
     input:focus, textarea:focus{
-        -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 0 8px rgba(170,170,170,.6);
         box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 0 8px rgba(170,170,170,.6);
     }
 
@@ -135,9 +134,6 @@
         margin-top: 9px;
         background: transparent url('../images/logo.png') no-repeat 0 0;
         text-indent: -9999px;
-        -webkit-transition: background 0.2s linear;
-        -moz-transition: background 0.2s linear;
-        -o-transition: background 0.2s linear;
         transition: background 0.2s linear;
     }
 
@@ -188,7 +184,6 @@
         padding-left:20px;
         background:transparent url('../images/user-dot-icon.png') center left no-repeat;
         transition:background 0.5s;
-        -webkit-transition:background 0.5s;
     }
 
     nav ul #userNav a#navToggle:hover{
@@ -200,10 +195,11 @@
     nav ul ul{
         display:none;
         position:absolute;
-        left:0px;
+        left:0;
         margin-left: -2px;
         background:#111;
         border: 1px solid #333;
+        z-index: 40;
     }
 
     nav ul ul li{
@@ -233,8 +229,6 @@
     }
 
     nav #userSettings img:hover{
-        -webkit-animation:spin 4s linear infinite;
-        -moz-animation:spin 4s linear infinite;
         animation:spin 4s linear infinite;
     }
 
@@ -315,7 +309,7 @@
     }
 
     .verticalFeedList li{
-        margin: 10px 0;
+        margin: 11px;
         overflow: auto;
         background: #090909;
         border-bottom: 1px solid #333;
@@ -397,24 +391,54 @@
     }
 
     /* ===================================================== */
-    /*                      About  Page                     */
-        #about{
-            overflow:hidden;
-        }
+    /*                        FAQ Page                     */
+    #faq{
+        text-align:left;
+    }
 
-        #about p{
-            text-align:left;
-        }
+    #faq ol{
+        padding: 0 17px 17px 17px;
+    }
 
-        #about img{
-            float:left;
-        }
+    #faq ol li{
+        margin:15px 0;
+        padding-bottom: 15px;
+        border-bottom:1px solid #333;
+        background: #111;
+    }
 
+    #faq span{
+        display:block;
+    }
+
+    #faq span.question{
+        font: normal 15px "Source sans pro", sans-serif;
+        margin-bottom: 7px;
+        padding: 7px;
+        border-bottom: 1px solid #888;
+        background: #134;
+    }
+
+    #faq span.answer{
+        padding-left:7px;
+    }
 
     /* ===================================================== */
-    /*                   Common Classes                      */
-        .feedShare .fb_iframe_widget{
-            vertical-align:middle;
+    /*                     History Page                       */
+        #historySort{
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        #historySort select{
+            padding: 11px 11px 10px 11px;
+            border: none;
+            margin: 0;
+            width: 110px;
+            background: #222;
+            border-left: 1px solid #333;
+            text-align: center;
         }
 
     /* ===================================================== */
@@ -424,7 +448,8 @@
             white-space: nowrap;
             overflow:hidden;
             position:relative;
-            padding:10px 0;
+            padding: 10px 0;
+            margin: 0 5px;
         }
 
         #youtubers li{
@@ -456,9 +481,11 @@
 
 
     /* ===================================================== */
-    /*                    Feed   View                       */
+    /*                    youtube   View                       */
 
         #feed iframe{
+            width:965px;
+            height:576px;
             border: 1px solid #222;
             padding: 6px;
             background: #000;
@@ -466,10 +493,13 @@
         }
 
         #info{
-            padding:15px 10px;
             font-size: 21px;
             background: rgba(0,0,0,0.85);
             text-align:center;
+        }
+
+        #info .wrapper{
+            padding:7px;
         }
 
         #title , #uploaded{
@@ -483,10 +513,6 @@
         #description{
             max-height: 185px;
             overflow: auto;
-        }
-
-        #info h1{
-            margin-top:-27px;
         }
 
         #rating{
@@ -526,23 +552,20 @@
 
         .module{
             position:relative;
-            margin-top: 40px;
-            padding: 20px 10px 10px 10px;
             background: #000;
             border: 1px solid #333;
             font-size:15px;
+            margin: 20px 0;
         }
 
         .module .hideToggle{
             right: 0;
             position: absolute;
-            margin: -39px 14px 0 0;
             font-size: 19px;
             cursor: pointer;
             background: #111;
-            border: 1px solid #333;
-            padding: 5px 10px;
-            border-radius: 3px;
+            border-left: 1px solid #333;
+            padding: 7px 10px;
         }
 
         .module p{
@@ -553,11 +576,13 @@
 
         .module h1{
             display: block;
-            margin-top: -33px;
-            position: absolute;
-            font:normal 20px 'Gafata', sans-serif;;
+            margin-top:0;
+            font:normal 18px 'Gafata', sans-serif;;
             color: white;
-            border-bottom: none;
+            background: #333 url(../images/flash-bg.png) 50% 50%;
+            border-bottom: 1px solid #333;
+            padding: 8px;
+            text-align: left;
         }
 
         .module{
@@ -565,15 +590,12 @@
         }
 
         .shadowed{
-            -webkit-transition: opacity 0.2s linear;
-            -moz-transition: opacity 0.2s linear;
-            -o-transition: opacity 0.2s linear;
             transition: opacity 0.2s linear;
             opacity:0.5;
         }
 
         .shadowed:hover{
-            opacity:0.85;
+            opacity:1;
         }
 
 /* ===================================================== */
@@ -617,18 +639,13 @@
         top: 0;
         left: 0;
         height: 100%;
-        background: transparent url('../images/video-mask.png') center center no-repeat;
-        background-color: rgba(34,34,34,0.5);
-        -webkit-transition: background 0.2s linear;
-        -moz-transition: background 0.2s linear;
-        -o-transition: background 0.2s linear;
+        background: rgba(34,34,34,0.5) url('../images/video-mask.png') center center no-repeat;
         transition: background 0.2s linear;
         cursor: pointer;
     }
 
     .videoMask:hover{
-        background: transparent url('../images/video-mask-hover.png') center center no-repeat;
-        background-color:rgba(34,34,34,0.9);
+        background: rgba(34,34,34,0.9) url('../images/video-mask-hover.png') center center no-repeat;
     }
 
 
@@ -675,6 +692,14 @@
         float:left;
     }
 
+    footer p a{
+        margin-left:5px;
+    }
+
+    footer p a img{
+        vertical-align: middle;
+    }
+
     footer nav ul{
         border:none;
     }
@@ -706,6 +731,7 @@
     .shortened{max-height:500px;}
     .centeredImage{display:block; margin:0 auto;}
     .semiTransparentBackground{background:rgba(0,0,0,0.85);}
+    .halfSized{width:800px; margin:30px auto;}
 
     .icon{
         display: inline-block;
@@ -724,13 +750,12 @@
 
     #shadow {
         position: fixed;
-        top: 0px;
-        left: 0px;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         background-color: black;
         opacity: 0.9;
-        filter: alpha(opacity=90);
         z-index: 99;
     }
 

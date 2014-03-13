@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Class Feed
  * @package Feed\Entity
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="\Feed\Repository\FeedRepository")
  * @ORM\Table(name="feeds")
  */
 class Feed {
@@ -34,9 +34,9 @@ class Feed {
     private $game;
 
     /**
-     * @ORM\ManyToMany(targetEntity="\Account\Entity\Account", mappedBy="feeds")
+     * @ORM\OneToMany(targetEntity="Account\Entity\AccountsHistory", mappedBy="feed")
      */
-    private $accounts;
+    private $watchedHistory;
 
     /**
      * @ORM\Column(type="string")

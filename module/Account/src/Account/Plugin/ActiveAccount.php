@@ -29,12 +29,13 @@ class ActiveAccount extends AbstractPlugin{
         $accService = $this->getAccountService();
         if($auth->hasIdentity()){
             $account = $em->getRepository('Account\Entity\Account')->find($auth->getIdentity()->getAccountId());
+
+            $accService->updateLastSeen($account);
+            $em->persist($account);
+            $em->flush();
         }else{
-            $account = $accService->getActiveAccount();
+            $account = false;
         }
-        $accService->updateLastSeen($account);
-        $em->persist($account);
-        $em->flush();
         return $account;
     }
 
