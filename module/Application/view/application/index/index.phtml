@@ -38,7 +38,7 @@
                 class="verticalFeedList shortened expandable">
                 <?php
                 foreach ($latestFeeds as $feed) {
-                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => true));
                 }
                 ?>
             </ul>

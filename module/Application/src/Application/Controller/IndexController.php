@@ -14,6 +14,8 @@ class IndexController extends AbstractActionController
     const EMAIL_ERROR = "The message failed to be submitted, please try again.";
     const EMAIL_SUCCESS = "Your message has been sent successfully.";
 
+    private $accountsHistoryRepository;
+
     /**
      * @var \Zend\Form\Form
      */
@@ -30,7 +32,7 @@ class IndexController extends AbstractActionController
         $feedRepository = $this->getFeedRepository();
         $feeds = $feedRepository->findBy(array("isRelated" => 0), array("rating" => "DESC"));
         $premiumFeeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"));
-        $latestFeeds = $feedRepository->findBy(array("isRelated" => 0), array("feedId" => "DESC"));
+        $latestFeeds = $this->getAccountsHistoryRepository()->findBy(array(), array("watchTime" => "DESC"));
         # $risingFeeds = $this->getGenerator()->getRisingFeeds(1);
 
         $feeds = new Paginator(new ArrayAdapter($feeds));
@@ -137,6 +139,12 @@ class IndexController extends AbstractActionController
         return new ViewModel(array(
             "form" => $form
         ));
+    }
+
+    public function getAccountsHistoryRepository(){
+        if($this->accountsHistoryRepository === null)
+            $this->accountsHistoryRepository = $this->getEntityManager()->getRepository('\Account\Entity\AccountsHistory');
+        return $this->accountsHistoryRepository;
     }
 
     /**
