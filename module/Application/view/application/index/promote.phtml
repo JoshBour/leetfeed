@@ -1,24 +1,32 @@
 <div id="main">
     <div id="promote" class="module semiTransparentBackground">
         <h1><?php echo $this->translate("Promote Your Videos"); ?></h1>
-        <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>"
-             alt="<?php echo $this->translate("leetfeed logo"); ?>"/>
-        <p><?php echo $this->translate("Are you a League of Legends video creator? Do you want to promote your videos even more? <br /> Then <strong>keep reading</strong>, this is for you!"); ?></p>
-        <p>
-            <?php echo $this->translate("Here at Leetfeed, we can promote your videos by placing them in the <strong>front page of our website</strong>, so that they will get the most views possible."); ?><br />
-        </p>
-        <img src="<?php echo $this->basePath('images/promoted.jpg');?>" alt="<?php echo $this->basePath('promotion image'); ?>" />
-        <p>
-            <?php
+
+        <div class="moduleBody">
+            <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>"
+                 alt="<?php echo $this->translate("leetfeed logo"); ?>"/>
+
+            <p><?php echo $this->translate("Are you a League of Legends video creator? Do you want to promote your videos even more? <br /> Then <strong>keep reading</strong>, this is for you!"); ?></p>
+
+            <p>
+                <?php echo $this->translate("Here at Leetfeed, we can promote your videos by placing them in the <strong>front page of our website</strong>, so that they will get the most views possible."); ?>
+                <br/>
+            </p>
+            <img src="<?php echo $this->basePath('images/promoted.jpg'); ?>"
+                 alt="<?php echo $this->basePath('promotion image'); ?>"/>
+
+            <p>
+                <?php
                 echo $this->translate("They will remain at the promoted feeds list for <strong>as long as it is agreed</strong>, without any chances of them getting lost among all the other videos. <br />
                     Moreover, we will provide you with email feedback on how many views they are getting on our page, so that you know how well they are doing.<br/>
                     The money we receive are used to support the website, so you are helping us in that part as well :) <br />
                     ");
-            ?>
-            <?php
+                ?>
+                <?php
                 echo $this->translate("For more info you can contact us at") . ' <a href="mailto:promote@leetfeed.com">promote@leetfeed.com</a> ' . $this->translate("(preferred way) ");
                 echo $this->translate("or through our") . ' <a href="' . $this->url('contact') . '">' . $this->translate("contact page.") . '</a>';
-            ?>
-        </p>
+                ?>
+            </p>
+        </div>
     </div>
 </div>

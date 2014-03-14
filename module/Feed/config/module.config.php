@@ -1,8 +1,6 @@
 <?php
 namespace Feed;
 
-use \Zend\InputFilter\InputFilter;
-
 return array(
     'doctrine' => array(
         'driver' => array(
@@ -19,40 +17,13 @@ return array(
     ),
     'router' => array(
         'routes' => array(
-            'rate' => array(
-                'type' => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
-                    'route'    => '/feed/rate/:rating/id/:id',
-                    'defaults' => array(
-                        'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'rate',
-                    ),
-                    'constraints' => array(
-                        'id' => '[0-9]+',
-                        'rating' => 'thumbUp|thumbDown'
-                    ),
-                ),
-            ),
-            'view' => array(
-                'type' => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
-                    'route'    => '/feed/:feedId',
-                    'defaults' => array(
-                        'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'view',
-                    ),
-                    'constraints' => array(
-                        'feedId' => '[0-9]+',
-                    ),
-                ),
-            ),
             'history' => array(
                 'type' => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route'    => '/history[/:sort]',
+                    'route' => '/history[/:sort]',
                     'defaults' => array(
                         'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'history',
+                        'action' => 'history',
                         'sort' => 'now'
                     ),
                 ),
@@ -60,74 +31,155 @@ return array(
             'random' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/random',
+                    'route' => '/random',
                     'defaults' => array(
                         'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'random',
+                        'action' => 'random',
                     ),
                 ),
             ),
             'famous' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/famous',
+                    'route' => '/famous',
                     'defaults' => array(
                         'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'famous',
+                        'action' => 'famous',
                     ),
                 ),
             ),
             'leet' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/leet',
+                    'route' => '/leet',
                     'defaults' => array(
                         'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'leet',
+                        'action' => 'leet',
                     ),
                 ),
             ),
-            'get-random-feed' => array(
+            'feed' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/get-random-feed',
+                    'route' => '/feed',
                     'defaults' => array(
-                        'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'get-random-feed',
-                    ),
+                        'controller' => 'Feed\Controller\Feed'
+                    )
                 ),
+                'may_terminate' => false,
+                'child_routes' => array(
+                    'add-to-watched' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/add-to-watched/:feedId',
+                            'defaults' => array(
+                                'action' => 'add-to-watched',
+                            ),
+                            'constraints' => array(
+                                'feedId' => '[0-9]+'
+                            )
+                        ),
+                    ),
+                    'get-random-feed' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => '/get-random-feed',
+                            'defaults' => array(
+                                'action' => 'get-random-feed',
+                            ),
+                        ),
+                    ),
+                    'view' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/:feedId',
+                            'defaults' => array(
+                                'action' => 'view',
+                            ),
+                            'constraints' => array(
+                                'feedId' => '[0-9]+',
+                            ),
+                        ),
+                    ),
+                    'rate' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/rate/:rating/id/:id',
+                            'defaults' => array(
+                                'action' => 'rate',
+                            ),
+                            'constraints' => array(
+                                'id' => '[0-9]+',
+                                'rating' => 'thumbUp|thumbDown'
+                            ),
+                        ),
+                    ),
+                    'get-youtuber-feeds' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/get-youtuber-feeds/:youtuberName',
+                            'defaults' => array(
+                                'action' => 'get-youtuber-feeds',
+                            ),
+                        ),
+                    ),
+                )
             ),
-            'add-to-watched' => array(
-                'type' => 'Zend\Mvc\Router\Http\Segment',
+            'comment' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/feed/add-to-watched/:feedId',
+                    'route' => '/comment',
                     'defaults' => array(
-                        'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'add-to-watched',
+                        'controller' => 'Feed\Controller\Comment',
                     ),
                 ),
-            ),
-            'get-youtuber-feeds' => array(
-                'type' => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
-                    'route'    => '/get-youtuber-feeds/:youtuberName',
-                    'defaults' => array(
-                        'controller' => 'Feed\Controller\Feed',
-                        'action'     => 'get-youtuber-feeds',
+                'may_terminate' => false,
+                'child_routes' => array(
+                    'add' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => '/add',
+                            'defaults' => array(
+                                'action' => 'add',
+                            ),
+                        ),
                     ),
-                ),
+                    'remove' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => '/remove',
+                            'defaults' => array(
+                                'action' => 'remove',
+                            ),
+                        ),
+                    ),
+                    'list' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/list/:feedId',
+                            'defaults' => array(
+                                'action' => 'list',
+                            ),
+                            'constraints' => array(
+                                'feedId' => "[0-9]+"
+                            )
+                        ),
+                    ),
+                )
             ),
         ),
     ),
     'service_manager' => array(
         'invokables' => array(
-                'feed_service' => 'Feed\Service\Feed',
-                'generator' => 'Feed\Model\FeedGenerator',
+            'feed_service' => 'Feed\Service\Feed',
+            'comment_service' => 'Feed\Service\Comment',
+            'generator' => 'Feed\Model\FeedGenerator',
         ),
     ),
     'controllers' => array(
         'invokables' => array(
-            'Feed\Controller\Feed' => 'Feed\Controller\FeedController'
+            'Feed\Controller\Feed' => 'Feed\Controller\FeedController',
+            'Feed\Controller\Comment' => 'Feed\Controller\CommentController'
         ),
     ),
     'view_manager' => array(
@@ -138,7 +190,8 @@ return array(
             'ViewJsonStrategy'
         ),
         'template_map' => array(
-            'feed' => __DIR__ . '/../view/feed/partial/feed.phtml'
+            'feed' => __DIR__ . '/../view/feed/partial/feed.phtml',
+            'comment' => __DIR__ . '/../view/feed/partial/comment.phtml'
         ),
     ),
 );

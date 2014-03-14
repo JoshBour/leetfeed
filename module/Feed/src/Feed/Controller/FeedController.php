@@ -21,7 +21,7 @@ class FeedController extends AbstractActionController
     const MESSAGE_RATE_SUCCESS = 'The rating has been saved successfully.';
     const MESSAGE_RATE_FAIL = 'Something went wrong when saving the rating, please try again.';
 
-    private $accountService;
+    const ERROR_STORE_FEED = "There was an error when storing the feed.";
 
     private $entityManager;
 
@@ -34,8 +34,6 @@ class FeedController extends AbstractActionController
     private $translator;
 
     private $youtuberRepository;
-
-    private $youtubeService;
 
 
     public function randomAction()
@@ -70,7 +68,7 @@ class FeedController extends AbstractActionController
             if ($feed) {
                 $success = 1;
             } else {
-                $message = "There was an error when storing the feed.";
+                $message = self::ERROR_STORE_FEED;
             }
             return new JsonModel(array(
                 "success" => $success,
@@ -201,16 +199,6 @@ class FeedController extends AbstractActionController
     }
 
     /**
-     * @return \Youtube\Service\Youtube
-     */
-    public function getYoutubeService()
-    {
-        if (null === $this->youtubeService)
-            $this->youtubeService = $this->getServiceLocator()->get("youtube_service");
-        return $this->youtubeService;
-    }
-
-    /**
      * @return \Feed\Model\FeedGenerator
      */
     public function getGenerator()
@@ -218,16 +206,6 @@ class FeedController extends AbstractActionController
         if (null === $this->generator)
             $this->generator = $this->getServiceLocator()->get("generator");
         return $this->generator;
-    }
-
-    /**
-     * @return \Account\Service\Account
-     */
-    public function getAccountService()
-    {
-        if (null === $this->accountService)
-            $this->accountService = $this->getServiceLocator()->get("account_service");
-        return $this->accountService;
     }
 
     /**

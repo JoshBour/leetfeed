@@ -8,7 +8,7 @@ $(function () {
 
     if ($('.module').attr('id') == "random") {
         $.ajax({
-            url: baseUrl + '/get-random-feed'
+            url: baseUrl + '/feed/get-random-feed'
         }).success(function (data) {
             console.log("done");
             window.location.href = baseUrl + "/feed/" + data.feedId;
@@ -41,9 +41,60 @@ $(function () {
         });
     });
 
+    $('#commentList').perfectScrollbar({
+        "wheelSpeed": 50
+    });
+
     $('#youtubers').perfectScrollbar({
         "wheelSpeed": 50,
         "suppressScrollY": true
+    });
+
+    $('#addComment').on('keyup', function (e) {
+        var input = $(this);
+        var val = input.val();
+        var remainingChars = input.parent().find('#remainingChars .number');
+        if (val.length > 150) {
+            remainingChars.addClass("redFont");
+        } else {
+            remainingChars.removeClass("redFont");
+            remainingChars.html(150 - val.length);
+        }
+    });
+
+    $('#addComment').pressEnter(function () {
+        var input = $(this);
+        var value = input.val();
+        if (value.length <= 150) {
+            var feedId = $('#feed').attr('class').substr(5);
+            $.ajax({
+                url: baseUrl + '/comment/add',
+                type: "POST",
+                data: {
+                    "feedId": feedId,
+                    "content": value
+                },
+                dataType: "html"
+            }).success(function (data) {
+                if (!isEmpty(data)) {
+                    var emptyComDiv = $('.emptyComments');
+                    if (emptyComDiv.length != 0) {
+                        emptyComDiv.replaceWith($('<ul/>', {
+                            "id": "commentList",
+                            "html": data
+                        }).perfectScrollbar({
+                            "wheelSpeed" : 50
+                        }));
+                    } else {
+                        $('#commentList').append(data).perfectScrollbar("update");
+                    }
+                    input.val('');
+                    input.parent().find('#remainingChars .number').html(150);
+                }
+            });
+        } else {
+            return;
+        }
     });
 
     var isScrolled = false;
@@ -98,7 +149,7 @@ $(function () {
             feedsList.slideUp();
             module.toggleLoadingImage();
             $.ajax({
-                url: baseUrl + '/get-youtuber-feeds/' + youtuberName,
+                url: baseUrl + '/feed/get-youtuber-feeds/' + youtuberName,
                 timeout: 20000
             }).done(function (data) {
                 feedsList.html('').append(data).slideDown();
@@ -121,13 +172,12 @@ $(function () {
 
     $('.hideToggle').on('click', function (e) {
         var btn = $(this);
-        var list = btn.siblings('ul');
-        console.log(list);
-        if (list.is(":visible")) {
-            list.slideUp();
+        var body = btn.siblings('.moduleBody');
+        if (body.is(":visible")) {
+            body.slideUp();
             btn.html("Show");
         } else {
-            list.slideDown();
+            body.slideDown();
             btn.html("Hide");
         }
     });

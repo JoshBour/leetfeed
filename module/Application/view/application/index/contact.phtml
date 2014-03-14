@@ -1,52 +1,55 @@
 <div id="main">
     <div class="module semiTransparentBackground halfSized">
-        <h1><?php echo $this->translate("Contact Us");?></h1>
-        <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>"
-             alt="<?php echo $this->translate("leetfeed logo"); ?>"/>
+        <h1><?php echo $this->translate("Contact Us"); ?></h1>
 
-        <p>
-            <?php
-            echo $this->translate("Did you find any bugs? Do you need to inform us about something? Feel free to use the contact form bellow.<br />
+        <div class="moduleBody">
+            <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>"
+                 alt="<?php echo $this->translate("leetfeed logo"); ?>"/>
+
+            <p>
+                <?php
+                echo $this->translate("Did you find any bugs? Do you need to inform us about something? Feel free to use the contact form bellow.<br />
                 We will get back to you as soon as possible!");
-            ?>
-        </p>
-        <?php
-        $form->prepare();
-        $form->setAttribute('action', $this->url('contact'));
-        $fieldset = $form->get('contact');
-
-        echo $this->form()->openTag($form);
-        #  echo $this->formHidden($form->get('security'));
-        ?>
-        <div class="element">
+                ?>
+            </p>
             <?php
-            echo $this->formElementErrors($fieldset->get('sender'), array('class' => 'formError'));
-            echo $this->formLabel($fieldset->get('sender'));
-            echo $this->formInput($fieldset->get('sender'));
+            $form->prepare();
+            $form->setAttribute('action', $this->url('contact'));
+            $fieldset = $form->get('contact');
+
+            echo $this->form()->openTag($form);
+            #  echo $this->formHidden($form->get('security'));
             ?>
+            <div class="element">
+                <?php
+                echo $this->formElementErrors($fieldset->get('sender'), array('class' => 'formError'));
+                echo $this->formLabel($fieldset->get('sender'));
+                echo $this->formInput($fieldset->get('sender'));
+                ?>
+            </div>
+
+            <div class="element">
+                <?php
+                echo $this->formElementErrors($fieldset->get('subject'), array('class' => 'formError'));
+                echo $this->formLabel($fieldset->get('subject'));
+                echo $this->formInput($fieldset->get('subject'));
+                ?>
+            </div>
+
+            <div class="element">
+                <?php
+                echo $this->formElementErrors($fieldset->get('body'), array('class' => 'formError'));
+                echo $this->formLabel($fieldset->get('body'));
+                echo $this->formTextarea($fieldset->get('body'));
+                ?>
+            </div>
+
+
+            <div class="element">
+                <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Submit'))); ?>
+            </div>
+
+            <?php echo $this->form()->closeTag() ?>
         </div>
-
-        <div class="element">
-            <?php
-            echo $this->formElementErrors($fieldset->get('subject'), array('class' => 'formError'));
-            echo $this->formLabel($fieldset->get('subject'));
-            echo $this->formInput($fieldset->get('subject'));
-            ?>
-        </div>
-
-        <div class="element">
-            <?php
-            echo $this->formElementErrors($fieldset->get('body'), array('class' => 'formError'));
-            echo $this->formLabel($fieldset->get('body'));
-            echo $this->formTextarea($fieldset->get('body'));
-            ?>
-        </div>
-
-
-        <div class="element">
-            <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Submit'))); ?>
-        </div>
-
-        <?php echo $this->form()->closeTag() ?>
     </div>
 </div>

@@ -498,7 +498,7 @@
             text-align:center;
         }
 
-        #info .wrapper{
+        #info .moduleBody{
             padding:7px;
         }
 
@@ -510,10 +510,58 @@
             float:left;
         }
 
-        #description{
-            max-height: 185px;
-            overflow: auto;
-        }
+        /* ===================================================== */
+        /*                    Comment List                      */
+
+            .emptyComments{
+                padding: 10px;
+                margin: 20px 0;
+                text-align: center;
+            }
+
+            input#addComment{
+                width: 810px;
+                padding: 10px;
+                border: none;
+                margin: 0;
+            }
+
+            input#addComment:focus{
+                box-shadow: none;
+            }
+
+            #commentList{
+                overflow:hidden;
+                position:relative;
+                min-height:300px;
+                max-height:500px;
+            }
+
+            .commentWrapper{
+                border-top: 1px solid #333;
+            }
+
+            #commentList li{
+                padding:10px 5px;
+                border-bottom:1px solid #333;
+            }
+
+            .commentAccount, .commentBody, .commentTime{
+                display:inline-block;
+            }
+
+            .commentTime{
+                float:right;
+                font-style: italic;
+                font-size: 13px;
+            }
+
+            #remainingChars{
+                display: inline-block;
+                padding: 0 10px;
+            }
+
+        /* ===================================================== */
 
         #rating{
             float:right;
@@ -732,6 +780,7 @@
     .centeredImage{display:block; margin:0 auto;}
     .semiTransparentBackground{background:rgba(0,0,0,0.85);}
     .halfSized{width:800px; margin:30px auto;}
+    .redFont{color:red;}
 
     .icon{
         display: inline-block;

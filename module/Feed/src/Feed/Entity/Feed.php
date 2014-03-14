@@ -18,6 +18,22 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="feeds")
  */
 class Feed {
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    private $author;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="feed")
+     */
+    private $comments;
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $description;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -34,30 +50,16 @@ class Feed {
     private $game;
 
     /**
-     * @ORM\OneToMany(targetEntity="Account\Entity\AccountsHistory", mappedBy="feed")
+     * @ORM\Column(type="smallint")
+     * @ORM\Column(name="is_related")
      */
-    private $watchedHistory;
+    private $isRelated;
 
     /**
-     * @ORM\Column(type="string")
-     * @ORM\Column(name="video_id")
+     * @ORM\Column(type="smallint")
+     * @ORM\Column(name="is_rising")
      */
-    private $videoId;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    private $title;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    private $author;
-
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $description;
+    private $isRising;
 
     /**
      * @ORM\Column(type="integer")
@@ -71,17 +73,33 @@ class Feed {
     private $ratings;
 
     /**
-     * @ORM\Column(type="smallint")
-     * @ORM\Column(name="is_related")
+     * @ORM\Column(type="string")
      */
-    private $isRelated;
+    private $title;
 
     /**
-     * @ORM\Column(type="smallint")
-     * @ORM\Column(name="is_rising")
+     * @ORM\Column(type="string")
+     * @ORM\Column(name="video_id")
      */
-    private $isRising;
+    private $videoId;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Account\Entity\AccountsHistory", mappedBy="feed")
+     */
+    private $watchedHistory;
+
+    /**
+     * Creates and returns a new Feed entity.
+     *
+     * @param Game $game
+     * @param int $videoId
+     * @param string $title
+     * @param string $author
+     * @param string $description
+     * @param int $related
+     * @param int $rising
+     * @return Feed
+     */
     public static function create($game,$videoId,$title,$author,$description,$related = 0,$rising=0){
         $feed = new Feed();
         $feed->setGame($game);
@@ -96,19 +114,31 @@ class Feed {
     }
 
     public function __construct(){
+        $this->comments = new ArrayCollection();
         $this->accounts = new ArrayCollection();
         $this->ratings = new ArrayCollection();
     }
 
+    /**
+     * Returns an array with the feed's og tags.
+     *
+     * @return array
+     */
     public function getOgTags(){
-        $ogtags = array();
-        $ogtags["title"] = $this->title;
-        $ogtags["description"] = "Watch the best League of Legends videos on Leetfeed.";
-        $ogtags["image"] = 'http://img.youtube.com/vi/' . $this->videoId . '/default.jpg';
-        $ogtags["url"] = "http://www.leetfeed.com/feed/" . $this->feedId;
-        return $ogtags;
+        $ogTags = array();
+        $ogTags["title"] = $this->title;
+        $ogTags["description"] = "Watch the best League of Legends videos on Leetfeed.";
+        $ogTags["image"] = 'http://img.youtube.com/vi/' . $this->videoId . '/default.jpg';
+        $ogTags["url"] = "http://www.leetfeed.com/feed/" . $this->feedId;
+        return $ogTags;
     }
 
+    /**
+     * Returns the thumbnail url of the Feed, given the quality.
+     *
+     * @param string $quality
+     * @return string
+     */
     public function getThumbnail($quality = "default"){
         $prefix = "http://img.youtube.com/vi/{$this->videoId}";
         switch($quality){
@@ -132,6 +162,22 @@ class Feed {
     }
 
     /**
+     * @param ArrayCollection $accounts
+     */
+    public function setAccounts($accounts)
+    {
+        $this->accounts = $accounts;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getAccounts()
+    {
+        return $this->accounts;
+    }
+
+    /**
      * @param mixed $author
      */
     public function setAuthor($author)
@@ -145,6 +191,22 @@ class Feed {
     public function getAuthor()
     {
         return $this->author;
+    }
+
+    /**
+     * @param mixed $comments
+     */
+    public function setComments($comments)
+    {
+        $this->comments = $comments;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getComments()
+    {
+        return $this->comments;
     }
 
     /**
@@ -162,7 +224,6 @@ class Feed {
     {
         return $this->description;
     }
-
 
     /**
      * @param mixed $feedId
@@ -194,38 +255,6 @@ class Feed {
     public function getGame()
     {
         return $this->game;
-    }
-
-    /**
-     * @param mixed $rating
-     */
-    public function setRating($rating)
-    {
-        $this->rating = $rating;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRating()
-    {
-        return $this->rating;
-    }
-
-    /**
-     * @param mixed $ratings
-     */
-    public function setRatings($ratings)
-    {
-        $this->ratings = $ratings;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRatings()
-    {
-        return $this->ratings;
     }
 
     /**
@@ -261,6 +290,38 @@ class Feed {
     }
 
     /**
+     * @param mixed $rating
+     */
+    public function setRating($rating)
+    {
+        $this->rating = $rating;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRating()
+    {
+        return $this->rating;
+    }
+
+    /**
+     * @param mixed $ratings
+     */
+    public function setRatings($ratings)
+    {
+        $this->ratings = $ratings;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getRatings()
+    {
+        return $this->ratings;
+    }
+
+    /**
      * @param mixed $title
      */
     public function setTitle($title)
@@ -293,20 +354,21 @@ class Feed {
     }
 
     /**
-     * @param mixed $accounts
+     * @param mixed $watchedHistory
      */
-    public function setAccounts($accounts)
+    public function setWatchedHistory($watchedHistory)
     {
-        $this->accounts = $accounts;
+        $this->watchedHistory = $watchedHistory;
     }
 
     /**
      * @return mixed
      */
-    public function getAccounts()
+    public function getWatchedHistory()
     {
-        return $this->accounts;
+        return $this->watchedHistory;
     }
+
 
 
 

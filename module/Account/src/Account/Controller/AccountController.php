@@ -86,10 +86,12 @@ class AccountController extends AbstractActionController
                 $data = $request->getPost();
                 $loginForm->setData($data);
                 if ($loginForm->isValid()) {
+                    $redirectUrl = $this->params()->fromRoute("redirectUrl",null);
                     return $this->forward()->dispatch(static::CONTROLLER_NAME, array('action' => 'authenticate',
                         'username' => $entity->getUsername(),
                         'password' => $entity->getPassword(),
-                        'remember' => $data['account']['remember']));
+                        'remember' => $data['account']['remember'],
+                        'redirectUrl' => $redirectUrl));
                 }
             }
             return new ViewModel(array(
@@ -164,7 +166,7 @@ class AccountController extends AbstractActionController
         $remember = $this->params()->fromRoute('remember', 1);
         $username = $this->params()->fromRoute('username');
         $password = $this->params()->fromRoute('password');
-
+        $redirectUrl = $this->params()->fromRoute('redirectUrl');
         $adapter->setIdentityValue($username);
         $adapter->setCredentialValue($password);
         $authResult = $authService->authenticate();
@@ -180,7 +182,12 @@ class AccountController extends AbstractActionController
             $this->flashMessenger()->addMessage($this->getTranslator()->translate(self::MESSAGE_INVALID_CREDENTIALS));
             return $this->redirect()->toRoute(self::ROUTE_LOGIN);
         }
-        return $this->redirect()->toRoute(self::ROUTE_HOMEPAGE);
+        if($redirectUrl){
+            $redirectUrl = str_replace('__','/',$redirectUrl);
+            return $this->redirect()->toUrl('/'.$redirectUrl);
+        }else{
+            return $this->redirect()->toRoute(self::ROUTE_HOMEPAGE);
+        }
     }
 
     /**

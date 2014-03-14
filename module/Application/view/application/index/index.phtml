@@ -2,33 +2,45 @@
     <div class="module">
         <div class="hideToggle shadowed">Hide</div>
         <h1>Feeds Being Watched</h1>
-        <ul data-page="1" data-total="<?php echo $latestFeeds->count(); ?>" id="latest-feeds" class="verticalFeedList shortened expandable">
-            <?php
-            foreach ($latestFeeds as $feed){
-                echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
-            }
-            ?>
-        </ul>
+
+        <div class="moduleBody">
+            <ul data-page="1" data-total="<?php echo $latestFeeds->count(); ?>" id="latest-feeds"
+                class="verticalFeedList shortened expandable">
+                <?php
+                foreach ($latestFeeds as $feed) {
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                }
+                ?>
+            </ul>
+        </div>
     </div>
     <div class="module">
         <h1>Promoted Feeds</h1>
-        <ul data-page="1" data-total="<?php echo $premiumFeeds->count(); ?>" id="promoted-feeds" class="verticalFeedList expandable">
-            <?php
-            foreach ($premiumFeeds as $feed){
-                echo $this->partial("feed", array('feed' => $feed, 'isPremium' => true));
-            }
-            ?>
-        </ul>
+
+        <div class="moduleBody">
+            <ul data-page="1" data-total="<?php echo $premiumFeeds->count(); ?>" id="promoted-feeds"
+                class="verticalFeedList expandable">
+                <?php
+                foreach ($premiumFeeds as $feed) {
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => true));
+                }
+                ?>
+            </ul>
+        </div>
     </div>
     <div class="module">
         <div class="hideToggle shadowed">Hide</div>
         <h1>Top Rated Feeds</h1>
-        <ul data-page="1" data-total="<?php echo $feeds->count(); ?>" id="top-feeds" class="verticalFeedList expandable">
-            <?php
-            foreach ($feeds as $feed){
-                echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
-            }
-            ?>
-        </ul>
+
+        <div class="moduleBody">
+            <ul data-page="1" data-total="<?php echo $feeds->count(); ?>" id="top-feeds"
+                class="verticalFeedList expandable">
+                <?php
+                foreach ($feeds as $feed) {
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                }
+                ?>
+            </ul>
+        </div>
     </div>
 </div>

@@ -1,47 +1,51 @@
 <div id="main">
     <div id="login" class="module semiTransparentBackground">
         <h1>Login</h1>
-        <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>" alt="<?php echo $this->translate("Leetfeed Logo"); ?>"/>
-        <?php
+
+        <div class="moduleBody">
+            <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>"
+                 alt="<?php echo $this->translate("Leetfeed Logo"); ?>"/>
+            <?php
             $form->prepare();
             $form->setAttribute('action', $this->url('login'));
             $fieldset = $form->get('account');
 
-            echo $this->form()->openTag($form) ;
-         #   echo $this->formHidden($form->get('security'));
-        ?>
-                <div class="element">
-                    <?php
-                    echo $this->formElementErrors($fieldset->get('username'),array('class'=>'formError')) ;
-                    echo $this->formLabel($fieldset->get('username'));
-                    echo $this->formInput($fieldset->get('username'));
-                    ?>
-                </div>
+            echo $this->form()->openTag($form);
+            #   echo $this->formHidden($form->get('security'));
+            ?>
+            <div class="element">
+                <?php
+                echo $this->formElementErrors($fieldset->get('username'), array('class' => 'formError'));
+                echo $this->formLabel($fieldset->get('username'));
+                echo $this->formInput($fieldset->get('username'));
+                ?>
+            </div>
 
-                <div class="element">
-                    <?php
-                    echo $this->formElementErrors($fieldset->get('password'),array('class'=>'formError')) ;
-                    echo $this->formLabel($fieldset->get('password'));
-                    echo $this->formInput($fieldset->get('password'));
-                    ?>
-                </div>
+            <div class="element">
+                <?php
+                echo $this->formElementErrors($fieldset->get('password'), array('class' => 'formError'));
+                echo $this->formLabel($fieldset->get('password'));
+                echo $this->formInput($fieldset->get('password'));
+                ?>
+            </div>
 
-                <div class="element">
-                    <?php
-                    echo $this->formElementErrors($fieldset->get('remember'),array('class'=>'formError')) ;
-                    echo $this->formLabel($fieldset->get('remember'));
-                    echo $this->formCheckbox($fieldset->get('remember'));
-                    ?>
-                </div>
+            <div class="element">
+                <?php
+                echo $this->formElementErrors($fieldset->get('remember'), array('class' => 'formError'));
+                echo $this->formLabel($fieldset->get('remember'));
+                echo $this->formCheckbox($fieldset->get('remember'));
+                ?>
+            </div>
 
-                <div class="element">
-                    <?php echo $this -> formSubmit($form -> get('submit')->setValue($this -> translate('Login'))); ?>
-                </div>
+            <div class="element">
+                <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Login'))); ?>
+            </div>
 
-        <?php echo $this->form()->closeTag() ?>
+            <?php echo $this->form()->closeTag() ?>
 
-        <p>
-            Do you not have an account? Click <a href="<?php echo $this->url('register'); ?>">here to register.</a>
-        </p>
+            <p>
+                Do you not have an account? Click <a href="<?php echo $this->url('register'); ?>">here to register.</a>
+            </p>
+        </div>
     </div>
 </div>

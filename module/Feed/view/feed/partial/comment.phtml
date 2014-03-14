@@ -1,0 +1,13 @@
+<?php
+/**
+ * @var $comment \Feed\Entity\Comment
+ */
+$comment = $this->comment;
+if($comment):
+?>
+<div class="comment-<?php echo $comment->getCommentId(); ?>">
+    <div class="commentAccount"><span class="author"><?php echo $comment->getAccount()->getUsername(); ?></span> :</div>
+    <div class="commentBody"><?php echo $this->escapeHtml($comment->getContent()); ?></div>
+    <div class="commentTime"><?php echo (isset($isRecent) && $isRecent) ? "moments" : $comment->getTimeAgo(); ?> ago</div>
+</div>
+<?php endif; ?>

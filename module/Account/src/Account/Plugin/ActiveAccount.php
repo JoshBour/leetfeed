@@ -23,6 +23,9 @@ class ActiveAccount extends AbstractPlugin{
        return $this->getAccount();
     }
 
+    /**
+     * @return bool|\Account\Entity\Account
+     */
     public function getAccount(){
         $em = $this->getEntityManager();
         $auth = $this->getAuthService();

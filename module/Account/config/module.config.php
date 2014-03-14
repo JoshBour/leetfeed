@@ -32,9 +32,9 @@ return array(
     'router' => array(
         'routes' => array(
             'login' => array(
-                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'type' => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route'    => '/login',
+                    'route'    => '/login[/redirect/:redirectUrl]',
                     'defaults' => array(
                         'controller' => 'Account\Controller\Account',
                         'action'     => 'login',

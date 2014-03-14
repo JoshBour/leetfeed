@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Josh
- * Date: 27/2/2014
- * Time: 4:25 μμ
- */
-
 namespace Account\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -30,18 +23,9 @@ class Account
     private $accountId;
 
     /**
-     * @ORM\Column(type="string")
-     * @ORM\Column(length=50)
-     * @ORM\Column(nullable=true)
+     * @ORM\OneToMany(targetEntity="Feed\Entity\Comment", mappedBy="account")
      */
-    private $username;
-
-    /**
-     * @ORM\Column(type="string")
-     * @ORM\Column(length=128)
-     * @ORM\Column(nullable=true)
-     */
-    private $password;
+    private $comments;
 
     /**
      * @ORM\Column(type="string")
@@ -51,10 +35,9 @@ class Account
     private $email;
 
     /**
-     * @ORM\Column(type="string")
-     * @ORM\Column(length=50)
+     * @ORM\OneToMany(targetEntity="AccountsHistory", mappedBy="account")
      */
-    private $ip;
+    private $feeds;
 
     /**
      * @ORM\Column(type="datetime")
@@ -63,9 +46,10 @@ class Account
     private $firstSeen;
 
     /**
-     * @ORM\OneToMany(targetEntity="AccountsHistory", mappedBy="account")
+     * @ORM\Column(type="string")
+     * @ORM\Column(length=50)
      */
-    private $feeds;
+    private $ip;
 
     /**
      * @ORM\Column(type="timestamp")
@@ -74,9 +58,24 @@ class Account
     private $lastSeen;
 
     /**
+     * @ORM\Column(type="string")
+     * @ORM\Column(length=128)
+     * @ORM\Column(nullable=true)
+     */
+    private $password;
+
+    /**
      * @ORM\OneToMany(targetEntity="\Feed\Entity\Rating", mappedBy="account")
      */
     private $ratings;
+
+    /**
+     * @ORM\Column(type="string")
+     * @ORM\Column(length=50)
+     * @ORM\Column(nullable=true)
+     */
+    private $username;
+
 
     /**
      * Hash the password.
@@ -103,13 +102,22 @@ class Account
 
     public function __construct()
     {
+        $this->comments = new ArrayCollection();
         $this->feeds = new ArrayCollection();
         $this->ratings = new ArrayCollection();
     }
 
+    /**
+     * Returns an array including the account's leet'ed feeds.
+     *
+     * @return array
+     */
     public function getLikedFeeds()
     {
         $liked = array();
+        /**
+         * @var $rating \Feed\Entity\Rating
+         */
         foreach ($this->ratings->toArray() as $rating)
             if ($rating->getRating() == 1) $liked[] = $rating->getFeed();
         return $liked;
@@ -123,14 +131,26 @@ class Account
      */
     public function getRated($feed)
     {
+        /**
+         * @var $rating \Feed\Entity\Rating
+         */
         foreach ($this->ratings->toArray() as $rating)
             if ($rating->getFeed()->getFeedId() == $feed) return $rating;
         return null;
     }
 
+    /**
+     * Check if the user has watched a feed
+     *
+     * @param \Youtube\Model\Video $feed
+     * @return bool
+     */
     public function hasWatched($feed)
     {
         $id = $feed->getId();
+        /**
+         * @var $watchedFeed AccountsHistory
+         */
         foreach ($this->feeds as $watchedFeed) {
             if ($watchedFeed->getFeed()->getFeedId() == $id) return true;
         }
@@ -154,6 +174,22 @@ class Account
     }
 
     /**
+     * @param ArrayCollection $comments
+     */
+    public function setComments($comments)
+    {
+        $this->comments = $comments;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    /**
      * @param mixed $email
      */
     public function setEmail($email)
@@ -170,13 +206,8 @@ class Account
     }
 
     /**
-     * @param mixed $feeds
+     * @param array|\Feed\Entity\Feed $feeds
      */
-    public function setFeeds($feeds)
-    {
-        $this->feeds = $feeds;
-    }
-
     public function addFeeds($feeds)
     {
         if (is_array($feeds)) {
@@ -185,6 +216,14 @@ class Account
         } else {
             $this->feeds->add($feeds);
         }
+    }
+
+    /**
+     * @param ArrayCollection $feeds
+     */
+    public function setFeeds($feeds)
+    {
+        $this->feeds = $feeds;
     }
 
     /**
@@ -268,7 +307,7 @@ class Account
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getRatings()
     {
@@ -290,6 +329,7 @@ class Account
     {
         return $this->username;
     }
+
 
 
 }
