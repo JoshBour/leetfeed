@@ -144,7 +144,8 @@ class FeedController extends AbstractActionController
                     $em->flush();
                 }
                 if($this->identity()) $this->getFeedService()->addFeedToWatched($feedId);
-                $related = $this->getGenerator()->getRelatedFeeds($feed->getVideoId());
+                $relatedFeeds = $feed->getRelatedFeeds();
+                $related = ($relatedFeeds->count() < 20) ? $this->getGenerator()->getRelatedFeeds($feed) : $relatedFeeds;
                 $ogTags = $feed->getOgTags();
                 return new ViewModel(array(
                     "feed" => $feed,

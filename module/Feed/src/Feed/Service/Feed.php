@@ -77,7 +77,7 @@ class Feed implements ServiceManagerAwareInterface{
                     if(!$isPersisted) $em->persist($feed);
                     $flush = true;
                 }
-                if(!in_array($feed,$feeds)){
+                if(!$youtuber->hasFeed($feed)){
                     $feeds[] = $feed;
                     $youtuber->addFeeds($feed);
                     $persistYoutuber = true;

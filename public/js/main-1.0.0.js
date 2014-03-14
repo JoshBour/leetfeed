@@ -153,7 +153,7 @@ $(function () {
                 timeout: 20000
             }).done(function (data) {
                 feedsList.html('').append(data).slideDown();
-                feedsList.siblings('h1').html(youtuberSpan.html() + "'s Latest Feeds");
+                feedsList.parent().siblings('h1').html(youtuberSpan.html() + "'s Latest Feeds");
                 module.toggleLoadingImage();
                 isSearchingYoutuberFeeds = false;
                 feedsList.perfectScrollbar("destroy");

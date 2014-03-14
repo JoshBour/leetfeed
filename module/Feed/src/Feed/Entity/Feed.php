@@ -73,6 +73,20 @@ class Feed {
     private $ratings;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Feed", inversedBy="relatedFeedsToMe")
+     * @ORM\JoinTable(name="related_feeds",
+     *      joinColumns={@ORM\JoinColumn(name="feed_id", referencedColumnName="feed_id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="related_feed_id", referencedColumnName="feed_id")}
+     *      )
+     */
+    private $relatedFeeds;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Feed", mappedBy="relatedFeeds")
+     */
+    private $relatedFeedsToMe;
+
+    /**
      * @ORM\Column(type="string")
      */
     private $title;
@@ -117,6 +131,8 @@ class Feed {
         $this->comments = new ArrayCollection();
         $this->accounts = new ArrayCollection();
         $this->ratings = new ArrayCollection();
+        $this->relatedFeeds = new ArrayCollection();
+        $this->relatedFeedsToMe = new ArrayCollection();
     }
 
     /**
@@ -319,6 +335,50 @@ class Feed {
     public function getRatings()
     {
         return $this->ratings;
+    }
+
+    /**
+     * @param Feed|array $relatedFeeds
+     */
+    public function addRelatedFeeds($relatedFeeds){
+        if(is_array($relatedFeeds)){
+            foreach($relatedFeeds as $feed)
+                $this->relatedFeeds->add($feed);
+        }else{
+            $this->relatedFeeds->add($relatedFeeds);
+        }
+    }
+
+    /**
+     * @param mixed $relatedFeeds
+     */
+    public function setRelatedFeeds($relatedFeeds)
+    {
+        $this->relatedFeeds = $relatedFeeds;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRelatedFeeds()
+    {
+        return $this->relatedFeeds;
+    }
+
+    /**
+     * @param mixed $relatedFeedsToMe
+     */
+    public function setRelatedFeedsToMe($relatedFeedsToMe)
+    {
+        $this->relatedFeedsToMe = $relatedFeedsToMe;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRelatedFeedsToMe()
+    {
+        return $this->relatedFeedsToMe;
     }
 
     /**

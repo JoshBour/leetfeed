@@ -1,13 +1,14 @@
 <div id="main">
+
     <div class="module">
         <div class="hideToggle shadowed">Hide</div>
-        <h1>Feeds Being Watched</h1>
+        <h1>Top Rated Feeds</h1>
 
         <div class="moduleBody">
-            <ul data-page="1" data-total="<?php echo $latestFeeds->count(); ?>" id="latest-feeds"
-                class="verticalFeedList shortened expandable">
+            <ul data-page="1" data-total="<?php echo $feeds->count(); ?>" id="top-feeds"
+                class="verticalFeedList expandable">
                 <?php
-                foreach ($latestFeeds as $feed) {
+                foreach ($feeds as $feed) {
                     echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
                 }
                 ?>
@@ -30,13 +31,13 @@
     </div>
     <div class="module">
         <div class="hideToggle shadowed">Hide</div>
-        <h1>Top Rated Feeds</h1>
+        <h1>Feeds Being Watched</h1>
 
         <div class="moduleBody">
-            <ul data-page="1" data-total="<?php echo $feeds->count(); ?>" id="top-feeds"
-                class="verticalFeedList expandable">
+            <ul data-page="1" data-total="<?php echo $latestFeeds->count(); ?>" id="latest-feeds"
+                class="verticalFeedList shortened expandable">
                 <?php
-                foreach ($feeds as $feed) {
+                foreach ($latestFeeds as $feed) {
                     echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
                 }
                 ?>

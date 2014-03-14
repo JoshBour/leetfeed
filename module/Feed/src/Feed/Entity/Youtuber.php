@@ -63,6 +63,13 @@ class Youtuber {
         $this->feeds = new ArrayCollection();
     }
 
+    public function hasFeed($feed){
+        foreach($this->feeds as $ownFeed){
+            if($feed->getFeedId() == $ownFeed->getFeedId()) return true;
+        }
+        return false;
+    }
+
     public function addFeeds($feeds){
         if(is_array($feeds)){
             foreach($feeds as $feed)

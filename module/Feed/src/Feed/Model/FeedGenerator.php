@@ -76,31 +76,33 @@ class FeedGenerator implements ServiceManagerAwareInterface
 //        return $risingFeeds;
 //    }
 
-    public function getRelatedFeeds($id, $game = 1)
+    public function getRelatedFeeds($feed, $game = 1)
     {
         $em = $this->getEntityManager();
         $yt = $this->getYoutubeService();
         $feedRepository = $this->getFeedRepository();
         $game = $this->getGameRepository()->find($game);
-        $videoFeeds = $yt->findRelatedToId($id);
+        $videoFeeds = $yt->findRelatedToId($feed->getVideoId());
         $feedList = array();
         $flush = false;
         /**
          * @var $video \Youtube\Model\Video
          */
         foreach ($videoFeeds as $video) {
-            if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
-                $feed = \Feed\Entity\Feed::create($game,
+            if (!$newFeed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
+                $newFeed = \Feed\Entity\Feed::create($game,
                     $video->getId(),
                     $video->getTitle(),
                     $video->getChannel()->getTitle(),
                     $video->getDescription(), 1, 0);
-                $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
-                if (!$isPersisted) $em->persist($feed);
+                $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($newFeed);
+                if (!$isPersisted) $em->persist($newFeed);
                 $flush = true;
             }
-            $feedList[] = $feed;
+            $feedList[] = $newFeed;
         }
+        $feed->addRelatedFeeds($feedList);
+        $em->persist($feed);
         if ($flush) $em->flush();
         return $feedList;
     }
