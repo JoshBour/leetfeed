@@ -1,12 +1,14 @@
 <?php
 namespace Application\Controller;
 
+use Zend\Mail\Transport\SmtpOptions;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Mail\Message;
 use Zend\Mail\Transport\Sendmail as SendmailTransport;
 use Zend\Paginator\Adapter\ArrayAdapter;
 use Zend\Paginator\Paginator;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
 use Doctrine\ORM\EntityRepository;
 
 class IndexController extends AbstractActionController
@@ -121,12 +123,24 @@ class IndexController extends AbstractActionController
             if ($form->isValid()) {
                 $message = new Message();
                 $message->addTo('support@leetfeed.com')
-                    ->addFrom($data['contact']['sender'])
+                    ->addFrom("admin@leetfeed.com")
                     ->setSubject($data['contact']['subject'])
-                    ->setBody($data['contact']['body'])
+                    ->addReplyTo($data['contact']['sender'])
+                    ->setBody("From:" .$data['contact']['sender'] . '\r\n' . $data['contact']['body'])
                     ->setEncoding("UTF-8");
 
-                $transport = new SendmailTransport();
+                $transport = new SmtpTransport();
+                $options = new SmtpOptions(array(
+                    'name' => 'leetfeed.com',
+                    'host' => 'smtpout.europe.secureserver.net',
+                    'port' => '80',
+                    'connection_class'  => 'login',
+                    'connection_config' => array(
+                        'username' => 'support@leetfeed.com',
+                        'password' => '7934603745912766',
+                    )
+                ));
+                $transport->setOptions($options);
                 $transport->send($message);
 
                 $this->flashMessenger()->addMessage(self::EMAIL_SUCCESS);
