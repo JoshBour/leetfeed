@@ -6,6 +6,8 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta property="fb:app_id" content="268335233334900">
+    <meta property="fb:admins" content="1124061431">
     <?php echo $this->headTitle($pageTitle); ?>
 
     <?php
@@ -33,9 +35,7 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
         ->appendProperty('og:type', "website")
         ->appendProperty('og:url', $ogUrl)
         ->appendProperty('og:description', $ogDescription)
-        ->appendProperty('og:image', $ogImage)
-        ->appendProperty('fb:app_id', 268335233334900)
-        ->appendProperty('fb:admins', 1124061431);
+        ->appendProperty('og:image', $ogImage);
     ?>
 
     <!-- Styles -->
