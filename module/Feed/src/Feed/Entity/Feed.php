@@ -358,7 +358,7 @@ class Feed {
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getRelatedFeeds()
     {

@@ -76,35 +76,46 @@ class FeedGenerator implements ServiceManagerAwareInterface
 //        return $risingFeeds;
 //    }
 
+    /**
+     * @param \Feed\Entity\Feed $feed
+     * @param int $game
+     * @return array
+     */
     public function getRelatedFeeds($feed, $game = 1)
     {
-        $em = $this->getEntityManager();
-        $yt = $this->getYoutubeService();
-        $feedRepository = $this->getFeedRepository();
-        $game = $this->getGameRepository()->find($game);
-        $videoFeeds = $yt->findRelatedToId($feed->getVideoId());
-        $feedList = array();
-        $flush = false;
-        /**
-         * @var $video \Youtube\Model\Video
-         */
-        foreach ($videoFeeds as $video) {
-            if (!$newFeed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
-                $newFeed = \Feed\Entity\Feed::create($game,
-                    $video->getId(),
-                    $video->getTitle(),
-                    $video->getChannel()->getTitle(),
-                    $video->getDescription(), 1, 0);
-                $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($newFeed);
-                if (!$isPersisted) $em->persist($newFeed);
-                $flush = true;
+        $relatedFeeds = $feed->getRelatedFeeds();
+        if($relatedFeeds->count() < 50){
+            $feedList = array();
+            $flush = false;
+            $em = $this->getEntityManager();
+            $yt = $this->getYoutubeService();
+            $feedRepository = $this->getFeedRepository();
+            $game = $this->getGameRepository()->find($game);
+            $videoFeeds = $yt->findRelatedToId($feed->getVideoId());
+            /**
+             * @var $video \Youtube\Model\Video
+             */
+            foreach ($videoFeeds as $video) {
+                if (!$newFeed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
+                    $newFeed = \Feed\Entity\Feed::create($game,
+                        $video->getId(),
+                        $video->getTitle(),
+                        $video->getChannel()->getTitle(),
+                        $video->getDescription(), 1, 0);
+                    $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($newFeed);
+                    if (!$isPersisted) $em->persist($newFeed);
+                    $flush = true;
+                }
+                $feedList[] = $newFeed;
             }
-            $feedList[] = $newFeed;
+            for($i=0,$count=count($feedList);$i<$count;$i++){
+                if($relatedFeeds->contains(($feedList[$i]))) unset($feedList[$i]);
+            }
+            $feed->addRelatedFeeds($feedList);
+            $em->persist($feed);
+            if ($flush) $em->flush();
         }
-        $feed->addRelatedFeeds($feedList);
-        $em->persist($feed);
-        if ($flush) $em->flush();
-        return $feedList;
+        return $relatedFeeds;
     }
 
     public function getRandomFeed($gameId = 1)

@@ -135,6 +135,9 @@ class FeedController extends AbstractActionController
     {
         $feedId = $this->params()->fromRoute("feedId", null);
         if ($feedId) {
+            /**
+             * @var $feed \Feed\Entity\Feed
+             */
             $feed = $this->getFeedRepository()->find($feedId);
             if ($feed) {
                 if ($feed->getIsRelated() == 1) {
@@ -144,8 +147,7 @@ class FeedController extends AbstractActionController
                     $em->flush();
                 }
                 if($this->identity()) $this->getFeedService()->addFeedToWatched($feedId);
-                $relatedFeeds = $feed->getRelatedFeeds();
-                $related = ($relatedFeeds->count() < 20) ? $this->getGenerator()->getRelatedFeeds($feed) : $relatedFeeds;
+                $related = $this->getGenerator()->getRelatedFeeds($feed);
                 $ogTags = $feed->getOgTags();
                 return new ViewModel(array(
                     "feed" => $feed,
