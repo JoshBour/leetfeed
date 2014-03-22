@@ -29,6 +29,7 @@ $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '.
                                      target="_blank"><?php echo $author; ?></a></div>
             <div id="rating">
                 <?php
+                $account = $this->account();
                 if ($account && $rating = $account->getRated($feedId)) {
                     if ($rating->getRating() == 1) {
                         $up = ' class=" disabled" ';
@@ -71,9 +72,9 @@ $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '.
                 </div>
             <?php endif; ?>
             <div class="commentWrapper">
-                <?php if(!$this->identity()) echo '<a href="' . $this->url('login',array('redirectUrl'=>'feed_' . $feedId)) . '">'; ?>
+                <?php if (!$this->identity()) echo '<a href="' . $this->url('login', array('redirectUrl' => 'feed_' . $feedId)) . '">'; ?>
                 <input type="text" id="addComment" placeholder="<?php echo $this->translate("Post a comment"); ?>"/>
-                <?php if(!$this->identity()) echo '</a>'; ?>
+                <?php if (!$this->identity()) echo '</a>'; ?>
                 <div id="remainingChars">Remaining chars: <span class="number">150</span>/150</div>
             </div>
         </div>

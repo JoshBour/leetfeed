@@ -41,41 +41,6 @@ class FeedGenerator implements ServiceManagerAwareInterface
         $this->startIndex = -49;
     }
 
-//    public function getRisingFeeds($requiredFeeds)
-//    {
-//        $feedRepository = $this->getFeedRepository();
-//        $risingFeeds = $feedRepository->findBy(array("isRising" => "1"));
-//        $feedNum = count($risingFeeds);
-//        $em = $this->getEntityManager();
-//        $game = $this->getGameRepository()->find(1);
-//        $startIndex = 1;
-//        $count = 0;
-//        $i = 0;
-//        if ($feedNum < $requiredFeeds) {
-//            do {
-//                $videoFeed = $this->getFeedsByQuery(50, "this_week", $startIndex);
-//                foreach ($videoFeed as $video) {
-//                    if ($feed = $feedRepository->findOneBy(array("videoId" => $video->getVideoId()))) {
-//                        if ($feed->getIsRising() == 1) continue;
-//                        $feed->setIsRising(1);
-//                    } else {
-//                        $entry = new YoutubeEntry($video);
-//                        $feed = \Feed\Entity\Feed::create($game,
-//                            $entry->getVideoId(),
-//                            $entry->getTitle(),
-//                            $entry->getAuthor(),
-//                            $entry->getDescription(), 1, 0);
-//                    }
-//                    $em->persist($feed);
-//                    $risingFeeds[] = $feed;
-//                    $count++;
-//                }
-//                $startIndex+=50;
-//            } while ($count < $requiredFeeds - $feedNum);
-//        }
-//        return $risingFeeds;
-//    }
-
     /**
      * @param \Feed\Entity\Feed $feed
      * @param int $game
@@ -84,7 +49,7 @@ class FeedGenerator implements ServiceManagerAwareInterface
     public function getRelatedFeeds($feed, $game = 1)
     {
         $relatedFeeds = $feed->getRelatedFeeds();
-        if($relatedFeeds->count() < 50){
+        if ($relatedFeeds->count() < 50) {
             $feedList = array();
             $flush = false;
             $em = $this->getEntityManager();
@@ -108,8 +73,8 @@ class FeedGenerator implements ServiceManagerAwareInterface
                 }
                 $feedList[] = $newFeed;
             }
-            for($i=0,$count=count($feedList);$i<$count;$i++){
-                if($relatedFeeds->contains(($feedList[$i]))) unset($feedList[$i]);
+            for ($i = 0, $count = count($feedList); $i < $count; $i++) {
+                if ($relatedFeeds->contains(($feedList[$i]))) unset($feedList[$i]);
             }
             $feed->addRelatedFeeds($feedList);
             $em->persist($feed);
@@ -134,7 +99,7 @@ class FeedGenerator implements ServiceManagerAwareInterface
         $randFeed = $feeds[rand(0, count($feeds) - 1)];
         $checkedFeeds = array();
         // while the account has seen the feed, search for an other one
-        if($account){
+        if ($account) {
             while ($account->hasWatched($randFeed)) {
                 if (count($checkedFeeds) == count($feeds)) {
                     $checkedFeeds = array();
@@ -147,12 +112,12 @@ class FeedGenerator implements ServiceManagerAwareInterface
 
         // save the feed to accounts feeds
         $added = false;
-        if(!$feed = $feedRepository->findOneBy(array("videoId"=>$randFeed->getId()))){
+        if (!$feed = $feedRepository->findOneBy(array("videoId" => $randFeed->getId()))) {
             $feed = \Feed\Entity\Feed::create($game, $randFeed->getId(), $randFeed->getTitle(), $randFeed->getChannel()->getTitle(), $randFeed->getDescription());
             $added = true;
             $em->persist($feed);
         }
-        if($account){
+        if ($account) {
             $this->getFeedService()->addFeedToWatched($feed->getFeedId());
 //            $watchedFeed = \Account\Entity\AccountsHistory::create($account,$feed);
 //            $account->addFeeds($watchedFeed);
@@ -160,7 +125,7 @@ class FeedGenerator implements ServiceManagerAwareInterface
 //            $em->persist($account);
         }
         $em->flush();
-        return $added ? $feedRepository->findOneBy(array("videoId"=>$randFeed->getId())) : $feed;
+        return $added ? $feedRepository->findOneBy(array("videoId" => $randFeed->getId())) : $feed;
     }
 
     private function getRandomFeedList()

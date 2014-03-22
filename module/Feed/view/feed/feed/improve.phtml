@@ -1,0 +1,32 @@
+<div id="main">
+    <div id="history" class="module">
+        <h1>Improve</h1>
+
+        <div class="moduleBody">
+            <div class="moduleSort">
+                <select>
+                    <?php
+                    foreach ($summoners as $summoner):
+                        $name = $summoner->getName();
+                        ?>
+                        <option<?php echo ($name == $activeSummonerName) ? ' selected="selected"' : ''; ?>
+                            value="<?php echo $this->url('improve', array("summonerId" => $summoner->getSummonerId())); ?>"><?php echo $name; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php if (count($feeds) > 0) { ?>
+                <ul class="verticalFeedList">
+                    <?php
+                    foreach ($feeds as $feed) {
+                        echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                    }
+                    ?>
+                </ul>
+            <?php } else { ?>
+                <p>You haven't played any games recently with <?php echo $activeSummonerName; ?> and so we can't provide
+                    feeds.</p>
+            <?php } ?>
+        </div>
+    </div>
+</div>

@@ -1,90 +1,116 @@
 <?php
 namespace Application\Controller;
 
+use Doctrine\ORM\EntityRepository;
+use Zend\Mail\Message;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
 use Zend\Mail\Transport\SmtpOptions;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\Mail\Message;
-use Zend\Mail\Transport\Sendmail as SendmailTransport;
 use Zend\Paginator\Adapter\ArrayAdapter;
 use Zend\Paginator\Paginator;
-use Zend\Mail\Transport\Smtp as SmtpTransport;
-use Doctrine\ORM\EntityRepository;
+use Zend\View\Model\ViewModel;
 
 class IndexController extends AbstractActionController
 {
     const EMAIL_ERROR = "The message failed to be submitted, please try again.";
     const EMAIL_SUCCESS = "Your message has been sent successfully.";
 
+    /**
+     * The account history repository.
+     *
+     * @var EntityRepository
+     */
     private $accountsHistoryRepository;
 
     /**
+     * The contact form.
+     *
      * @var \Zend\Form\Form
      */
     private $contactForm;
 
+    /**
+     * The entity manager.
+     *
+     * @var \Doctrine\ORM\EntityManager
+     */
     private $entityManager;
 
+    /**
+     * The feed repository
+     *
+     * @var \Feed\Repository\FeedRepository
+     */
     private $feedRepository;
 
+    /**
+     * The premium feed repository
+     *
+     * @var EntityRepository
+     */
     private $premiumFeedRepository;
 
+    /**
+     * The index action.
+     * Route: \
+     *
+     * @return ViewModel
+     */
     public function indexAction()
     {
         $feedRepository = $this->getFeedRepository();
-        $feeds = $feedRepository->findBy(array("isRelated" => 0), array("rating" => "DESC"));
-        $premiumFeeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"));
-        $latestFeeds = $this->getAccountsHistoryRepository()->findBy(array(), array("watchTime" => "DESC"));
-        # $risingFeeds = $this->getGenerator()->getRisingFeeds(1);
+        $accountsHistoryRepository = $this->getAccountsHistoryRepository();
+        $feeds = $feedRepository->findBy(array("isRelated" => 0), array("rating" => "DESC"), 50);
+        $premiumFeeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"), 50);
+        $latestFeeds = $accountsHistoryRepository->findBy(array(), array("watchTime" => "DESC"), 50);
 
-        $feeds = new Paginator(new ArrayAdapter($feeds));
-        $feeds->setCurrentPageNumber(1);
-        $feeds->setItemCountPerPage(50);
+        $feedCnt = $feedRepository->countFeeds("0");
+        $feedTotalPages = intval(floor($feedCnt/50));
+
+        $latestFeedCnt = $accountsHistoryRepository->countFeeds();
+        $latestFeedsTotalPages = intval($latestFeedCnt/50);
 
         $premiumFeeds = new Paginator(new ArrayAdapter($premiumFeeds));
         $premiumFeeds->setCurrentPageNumber(1);
         $premiumFeeds->setItemCountPerPage(50);
 
-        $latestFeeds = new Paginator(new ArrayAdapter($latestFeeds));
-        $latestFeeds->setCurrentPageNumber(1);
-        $latestFeeds->setItemCountPerPage(50);
-
-        #  $risingFeeds = new Paginator(new ArrayAdapter($risingFeeds));
-        #  $risingFeeds->setCurrentPageNumber(1);
-        #  $risingFeeds->setItemCountPerPage(50);
-
         return new ViewModel(array(
             "feeds" => $feeds,
+            "feedPages" => $feedTotalPages,
             "premiumFeeds" => $premiumFeeds,
+            "latestFeedPages" => $latestFeedsTotalPages,
             "latestFeeds" => $latestFeeds,
-            #   "risingFeeds" => $risingFeeds,
         ));
     }
 
+    /**
+     * The get more feeds action
+     * Only accessed via xmlHttpRequest.
+     * Route: \get-more-feeds
+     *
+     * @return ViewModel
+     */
     public function getMoreFeedsAction()
     {
         if ($this->getRequest()->isXmlHttpRequest()) {
-            $feedRepository = $this->getFeedRepository();
             $category = $this->params()->fromRoute("category");
             $page = $this->params()->fromRoute("page", 1);
             $isPremium = false;
             switch ($category) {
                 case "top-feeds":
-                    $feeds = $feedRepository->findBy(array("isRelated" => 0), array("rating" => "DESC"));
+                    $feeds = $this->getFeedRepository()->findBy(array("isRelated" => 0), array("rating" => "DESC"),50, 50 * $page);
                     break;
                 case "premium-feeds":
-                    $feeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"));
+                    $feeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"),50, 50 * $page);
                     $isPremium = true;
                     break;
                 case "latest-feeds":
-                    $feeds = $feedRepository->findBy(array("isRelated" => 0), array("feedId" => "DESC"));
+                    $feeds = $this->getAccountsHistoryRepository()->findBy(array(), array("watchTime" => "DESC"),50, 50 * $page);
+                    $isPremium = true;
                     break;
-                case "rising-feeds":
-                    $feeds = $this->getGenerator()->getRisingFeeds(($page*50)+1);
-                    break;
+                default:
+                    $feeds = array();
             }
-            $feeds = new Paginator(new ArrayAdapter($feeds));
-            $feeds->setCurrentPageNumber($page);
             $view = new ViewModel();
             $view->setTerminal(true);
             $view->setVariables(array(
@@ -93,28 +119,63 @@ class IndexController extends AbstractActionController
             ));
             return $view;
         } else {
-            $this->getResponse()->setStatusCode(404);
-            return;
+            return $this->notFoundAction();
         }
     }
-	
+
+    /**
+     * The test action.
+     * Used only in development.
+     * Route: /test
+     *
+     * @return ViewModel
+     */
+    public function testAction()
+    {
+        if ($this->identity()) {
+            $summoners = $this->account()->getSummoners();
+            $summoner = $summoners[0];
+            $feeds = $this->getServiceLocator()->get('feed_service')->getSummonerFeeds($summoner);
+            # $feeds = $this->getServiceLocator()->get('feed_service')->getLolProFeeds(array("Ahri","Aatrox","Jayce"));
+            return new ViewModel(array("feeds" => $feeds));
+        } else {
+            return $this->notFoundAction();
+        }
+    }
+
+    /**
+     * The faq action.
+     * Route: /faq
+     *
+     * @return ViewModel
+     */
     public function faqAction()
     {
         return new ViewModel();
     }
 
+    /**
+     * The promote action.
+     * Route: /promote
+     *
+     * @return ViewModel
+     */
     public function promoteAction()
     {
         return new ViewModel();
     }
 
-    public function aboutAction()
-    {
-        return new ViewModel();
-    }
-
+    /**
+     * The contact action.
+     * Route: /contact
+     *
+     * @return \Zend\Http\Response|ViewModel
+     */
     public function contactAction()
     {
+        /**
+         * @var $request \Zend\Http\Request
+         */
         $request = $this->getRequest();
         $form = $this->getContactForm();
         if ($request->isPost()) {
@@ -126,7 +187,7 @@ class IndexController extends AbstractActionController
                     ->addFrom("admin@leetfeed.com")
                     ->setSubject($data['contact']['subject'])
                     ->addReplyTo($data['contact']['sender'])
-                    ->setBody("From:" .$data['contact']['sender'] . '\r\n' . $data['contact']['body'])
+                    ->setBody("From:" . $data['contact']['sender'] . '\r\n' . $data['contact']['body'])
                     ->setEncoding("UTF-8");
 
                 $transport = new SmtpTransport();
@@ -134,7 +195,7 @@ class IndexController extends AbstractActionController
                     'name' => 'leetfeed.com',
                     'host' => 'smtpout.europe.secureserver.net',
                     'port' => '80',
-                    'connection_class'  => 'login',
+                    'connection_class' => 'login',
                     'connection_config' => array(
                         'username' => 'support@leetfeed.com',
                         'password' => '7934603745912766',
@@ -155,47 +216,16 @@ class IndexController extends AbstractActionController
         ));
     }
 
-    public function getAccountsHistoryRepository(){
-        if($this->accountsHistoryRepository === null)
+    /**
+     * Retrieve the accounts history repository.
+     *
+     * @return \Account\Repository\AccountsHistoryRepository
+     */
+    public function getAccountsHistoryRepository()
+    {
+        if ($this->accountsHistoryRepository === null)
             $this->accountsHistoryRepository = $this->getEntityManager()->getRepository('\Account\Entity\AccountsHistory');
         return $this->accountsHistoryRepository;
-    }
-
-    /**
-     * Retrieve the feed repository
-     *
-     * @return EntityRepository
-     */
-    public function getFeedRepository()
-    {
-        if (null === $this->feedRepository)
-            $this->feedRepository = $this->getEntityManager()->getRepository('\Feed\Entity\Feed');
-        return $this->feedRepository;
-    }
-
-    /**
-     * Retrieve the premium feed repository
-     *
-     * @return EntityRepository
-     */
-    public function getPremiumFeedRepository()
-    {
-        if (null === $this->premiumFeedRepository)
-            $this->premiumFeedRepository = $this->getEntityManager()->getRepository('\Feed\Entity\PremiumFeed');
-        return $this->premiumFeedRepository;
-    }
-
-    /**
-     * Retrieve the doctrine entity manager
-     *
-     * @return \Doctrine\ORM\EntityManager
-     */
-    public function getEntityManager()
-    {
-        if (null === $this->entityManager) {
-            $this->entityManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
-        }
-        return $this->entityManager;
     }
 
     /**
@@ -209,4 +239,43 @@ class IndexController extends AbstractActionController
             $this->contactForm = $this->getServiceLocator()->get("contact_form");
         return $this->contactForm;
     }
+
+    /**
+     * Retrieve the doctrine entity manager.
+     *
+     * @return \Doctrine\ORM\EntityManager
+     */
+    public function getEntityManager()
+    {
+        if (null === $this->entityManager) {
+            $this->entityManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
+        }
+        return $this->entityManager;
+    }
+
+    /**
+     * Retrieve the feed repository.
+     *
+     * @return \Feed\Repository\FeedRepository
+     */
+    public function getFeedRepository()
+    {
+        if (null === $this->feedRepository)
+            $this->feedRepository = $this->getEntityManager()->getRepository('\Feed\Entity\Feed');
+        return $this->feedRepository;
+    }
+
+    /**
+     * Retrieve the premium feed repository.
+     *
+     * @return EntityRepository
+     */
+    public function getPremiumFeedRepository()
+    {
+        if (null === $this->premiumFeedRepository)
+            $this->premiumFeedRepository = $this->getEntityManager()->getRepository('\Feed\Entity\PremiumFeed');
+        return $this->premiumFeedRepository;
+    }
+
+
 }

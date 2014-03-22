@@ -5,7 +5,7 @@
         <h1>Top Rated Feeds</h1>
 
         <div class="moduleBody">
-            <ul data-page="1" data-total="<?php echo $feeds->count(); ?>" id="top-feeds"
+            <ul data-page="1" data-total="<?php echo $feedPages; ?>" id="top-feeds"
                 class="verticalFeedList expandable">
                 <?php
                 foreach ($feeds as $feed) {
@@ -34,7 +34,7 @@
         <h1>Feeds Being Watched</h1>
 
         <div class="moduleBody">
-            <ul data-page="1" data-total="<?php echo $latestFeeds->count(); ?>" id="latest-feeds"
+            <ul data-page="1" data-total="<?php echo $latestFeedPages; ?>" id="latest-feeds"
                 class="verticalFeedList shortened expandable">
                 <?php
                 foreach ($latestFeeds as $feed) {

@@ -25,7 +25,7 @@ class LoginForm extends Form
         ));
 
         $this->setValidationGroup(array(
-        #    'security',
+            'security',
             'account' => array(
                 'username',
                 'password'

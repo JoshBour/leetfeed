@@ -19,39 +19,58 @@ class CommentController extends AbstractActionController
 {
 
     const ROUTE_HOME = 'home';
+
     const MESSAGE_RATE_SUCCESS = 'The rating has been saved successfully.';
     const MESSAGE_RATE_FAIL = 'Something went wrong when saving the rating, please try again.';
 
     const ERROR_FEED_NOT_FOUND = "The feed could not be found.";
 
     /**
+     * The comment repository.
+     *
      * @var EntityRepository
      */
     private $commentRepository;
 
     /**
+     * The comment service.
+     *
      * @var \Feed\Service\Comment
      */
     private $commentService;
 
     /**
+     * The entity manager.
+     *
      * @var EntityManager
      */
     private $entityManager;
 
     /**
+     * The feed repository.
+     *
      * @var \Feed\Repository\FeedRepository
      */
     private $feedRepository;
 
     /**
+     * The zend translator.
+     *
      * @var \Zend\I18n\Translator\Translator
      */
     private $translator;
 
+    /**
+     * The comment add action.
+     * Route: /comment/add
+     * Only accessed via xmlHttpRequest
+     *
+     * @return ViewModel
+     */
     public function addAction()
     {
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        // check if the request is xmlHttpRequest and if the identity exists
+        if ($this->getRequest()->isXmlHttpRequest() && $this->identity()) {
             $feedId = $this->params()->fromPost("feedId");
             $content = $this->params()->fromPost("content");
             $comment = $this->getCommentService()->create($feedId, $content);
@@ -60,14 +79,21 @@ class CommentController extends AbstractActionController
             $model->setVariable("comment", $comment);
             return $model;
         }else{
-            $this->getResponse()->setStatusCode(404);
-            return;
+            return $this->notFoundAction();
         }
     }
 
+    /**
+     * The comment remove action.
+     * Route: /comment/remove
+     * Only access via xmlHttpRequest
+     *
+     * @return JsonModel
+     */
     public function removeAction()
     {
-        if($this->getRequest()->isXmlHttpRequest()){
+        // check if the request is xmlHttpRequest and if the identity exists
+        if($this->getRequest()->isXmlHttpRequest() && $this->identity()){
             $commentId = $this->params()->fromPost("commentId");
             $result = $this->getCommentService()->remove($commentId);
             $success = ($result) ? 1 : 0;
@@ -75,11 +101,16 @@ class CommentController extends AbstractActionController
                 "success" => $success
             ));
         }else{
-            $this->getResponse()->setStatusCode(404);
-            return;
+            return $this->notFoundAction();
         }
     }
 
+    /**
+     * The comment list action.
+     * Route: /comment/list/:feedId
+     *
+     * @return \Zend\Http\Response|ViewModel
+     */
     public function listAction()
     {
         $feedId = $this->params()->fromRoute("feedId");
@@ -97,7 +128,31 @@ class CommentController extends AbstractActionController
     }
 
     /**
-     * Retrieve the doctrine entity manager
+     * Retrieve the comment repository.
+     *
+     * @return EntityRepository
+     */
+    public function getCommentRepository()
+    {
+        if (null === $this->commentRepository)
+            $this->commentRepository = $this->getEntityManager()->getRepository('\Feed\Entity\Comment');
+        return $this->commentRepository;
+    }
+
+    /**
+     * Retrieve the comment service.
+     *
+     * @return \Feed\Service\Comment
+     */
+    public function getCommentService()
+    {
+        if (null === $this->commentService)
+            $this->commentService = $this->getServiceLocator()->get('comment_service');
+        return $this->commentService;
+    }
+
+    /**
+     * Retrieve the doctrine entity manager.
      *
      * @return \Doctrine\ORM\EntityManager
      */
@@ -110,19 +165,7 @@ class CommentController extends AbstractActionController
     }
 
     /**
-     * Retrieve the comment repository
-     *
-     * @return EntityRepository
-     */
-    public function getCommentRepository()
-    {
-        if (null === $this->commentRepository)
-            $this->commentRepository = $this->getEntityManager()->getRepository('\Feed\Entity\Comment');
-        return $this->commentRepository;
-    }
-
-    /**
-     * Retrieve the feed repository
+     * Retrieve the feed repository.
      *
      * @return \Feed\Repository\FeedRepository
      */
@@ -131,18 +174,6 @@ class CommentController extends AbstractActionController
         if (null === $this->feedRepository)
             $this->feedRepository = $this->getEntityManager()->getRepository('\Feed\Entity\Feed');
         return $this->feedRepository;
-    }
-
-    /**
-     * Retrieve the comment service
-     *
-     * @return \Feed\Service\Comment
-     */
-    public function getCommentService()
-    {
-        if (null === $this->commentService)
-            $this->commentService = $this->getServiceLocator()->get('comment_service');
-        return $this->commentService;
     }
 
     /**

@@ -146,6 +146,7 @@ class Feed {
         $ogTags["description"] = "Watch the best League of Legends videos on Leetfeed.";
         $ogTags["image"] = $this->getThumbnail("medium");
         $ogTags["url"] = "http://www.leetfeed.com/feed/" . $this->feedId;
+        $ogTags["video"] = "http://www.youtube.com/v/" . $this->videoId . '?version=3&amp;autohide=1';
         return $ogTags;
     }
 

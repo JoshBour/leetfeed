@@ -1,11 +1,6 @@
 <?php
 namespace Account;
 
-use \Zend\InputFilter\InputFilter;
-use Zend\ServiceManager\ServiceManager;
-
-use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
-
 return array(
     'doctrine' => array(
         'driver' => array(
@@ -34,79 +29,74 @@ return array(
             'login' => array(
                 'type' => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route'    => '/login[/redirect/:redirectUrl]',
+                    'route' => '/login[/redirect/:redirectUrl]',
                     'defaults' => array(
                         'controller' => 'Account\Controller\Account',
-                        'action'     => 'login',
+                        'action' => 'login',
                     ),
                 ),
             ),
             'logout' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/logout',
+                    'route' => '/logout',
                     'defaults' => array(
                         'controller' => 'Account\Controller\Account',
-                        'action'     => 'logout',
+                        'action' => 'logout',
                     ),
                 ),
             ),
             'register' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route'    => '/register',
+                    'route' => '/register',
                     'defaults' => array(
                         'controller' => 'Account\Controller\Account',
-                        'action'     => 'register',
+                        'action' => 'register',
                     ),
                 ),
             ),
+            'account' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route' => '/account',
+                    'defaults' => array(
+                        'controller' => 'Account\Controller\Account',
+                    ),
+                ),
+                'may_terminate' => false,
+                'child_routes' => array(
+                    'summoners' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => '/summoners',
+                            'defaults' => array(
+                                'action' => 'summoners',
+                            ),
+                        ),
+                    ),
+                    'remove-summoner' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => '/remove-summoner',
+                            'defaults' => array(
+                                'action' => 'remove-summoner',
+                            ),
+                        ),
+                    ),
+                )
+            )
         ),
     ),
     'service_manager' => array(
         'invokables' => array(
-          'authStorage'  => 'Account\Model\AuthStorage',
-          'account_service' => 'Account\Service\Account'
+            'authStorage' => 'Account\Model\AuthStorage',
+            'account_service' => 'Account\Service\Account'
         ),
         'factories' => array(
-            'Zend\Authentication\AuthenticationService' => function(ServiceManager $sm){
-                    $authService = $sm->get('doctrine.authenticationservice.orm_default');
-                    $authService->setStorage($sm->get('AuthStorage'));
-                    return $authService;
-                }
-        ,
-            'account_login_form' => function(ServiceManager $sm){
-                    $entityManager = $sm->get('Doctrine\ORM\EntityManager');
-                    $fieldset = new Form\LoginFieldset($sm->get('translator'));
-                    $form = new Form\LoginForm();
-                    $hydrator = new DoctrineHydrator($entityManager, '\Account\Entity\Account');
-
-                    $fieldset->setUseAsBaseFieldset(true)
-                        ->setHydrator($hydrator)
-                        ->setObject(new Entity\Account);
-
-                    $form->add($fieldset)
-                        ->setInputFilter(new InputFilter())
-                        ->setHydrator($hydrator);
-
-                    return $form;
-                },
-            'account_register_form' => function(ServiceManager $sm){
-                    $entityManager = $sm->get('Doctrine\ORM\EntityManager');
-                    $fieldset = new Form\RegisterFieldset($sm->get('translator'));
-                    $form = new Form\RegisterForm();
-                    $hydrator = new DoctrineHydrator($entityManager, '\Account\Entity\Account');
-
-                    $fieldset->setAccountRepository($entityManager->getRepository('\Account\Entity\Account'))
-                        ->setUseAsBaseFieldset(true)
-                        ->setHydrator($hydrator)
-                        ->setObject(new Entity\Account);
-
-                    $form->add($fieldset)
-                        ->setInputFilter(new InputFilter())
-                        ->setHydrator($hydrator);
-                    return $form;
-                },
+            'Zend\Authentication\AuthenticationService' => 'Account\Factory\AuthFactory',
+            'account_login_form' => 'Account\Factory\LoginFormFactory',
+            'account_register_form' => 'Account\Factory\RegisterFormFactory',
         ),
         'aliases' => array(
             'auth_service' => 'Zend\Authentication\AuthenticationService'
@@ -122,20 +112,12 @@ return array(
     ),
     'controller_plugins' => array(
         'factories' => array(
-            'account' => function($sm){
-                    $plugin = new Plugin\ActiveAccount();
-                    $plugin->setServiceManager($sm->getServiceLocator());
-                    return $plugin;
-                }
+            'account' => 'Account\Factory\AccountPluginFactory'
         )
     ),
     'view_helpers' => array(
         'factories' => array(
-            'account' => function($sm){
-                    $helper = new View\Helper\User();
-                    $helper->setServiceManager($sm->getServiceLocator());
-                    return $helper;
-                }
+            'account' => 'Account\Factory\AccountViewHelperFactory'
         )
     ),
     'view_manager' => array(

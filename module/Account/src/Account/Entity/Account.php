@@ -70,6 +70,11 @@ class Account
     private $ratings;
 
     /**
+     * @ORM\OneToMany(targetEntity="\League\Entity\Summoner", mappedBy="account")
+     */
+    private $summoners;
+
+    /**
      * @ORM\Column(type="string")
      * @ORM\Column(length=50)
      * @ORM\Column(nullable=true)
@@ -105,6 +110,7 @@ class Account
         $this->comments = new ArrayCollection();
         $this->feeds = new ArrayCollection();
         $this->ratings = new ArrayCollection();
+        $this->summoners = new ArrayCollection();
     }
 
     /**
@@ -312,6 +318,48 @@ class Account
     public function getRatings()
     {
         return $this->ratings;
+    }
+
+    /**
+     * @param array|\League\Entity\Summoner $summoners
+     */
+    public function addSummoners($summoners)
+    {
+        if (is_array($summoners)) {
+            foreach ($summoners as $summoner)
+                $this->summoners->add($summoner);
+        } else {
+            $this->summoners->add($summoners);
+        }
+    }
+
+    /**
+     * @param array|\League\Entity\Summoner $summoners
+     */
+    public function removeSummoners($summoners)
+    {
+        if (is_array($summoners)) {
+            foreach ($summoners as $summoner)
+                $this->summoners->removeElement($summoner);
+        } else {
+            $this->summoners->removeElement($summoners);
+        }
+    }
+
+    /**
+     * @param mixed $summoners
+     */
+    public function setSummoners($summoners)
+    {
+        $this->summoners = $summoners;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSummoners()
+    {
+        return $this->summoners;
     }
 
     /**

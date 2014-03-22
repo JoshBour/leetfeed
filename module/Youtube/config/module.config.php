@@ -1,8 +1,6 @@
 <?php
 namespace Youtube;
 
-use \Zend\InputFilter\InputFilter;
-
 return array(
     'service_manager' => array(
         'invokables' => array(

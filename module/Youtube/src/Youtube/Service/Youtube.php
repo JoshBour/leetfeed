@@ -10,6 +10,7 @@ namespace Youtube\Service;
 
 use Youtube\Model\Channel;
 use Youtube\Model\Video;
+use Youtube\Model\PlaylistItems;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
@@ -37,11 +38,12 @@ class Youtube implements ServiceManagerAwareInterface
     {
         if ($time == "this_month") {
             $datetime = new \DateTime("-1 month");
-            $time = $datetime->format(\DateTime::RFC3339);
         } else if ($time == "this_week") {
+            $datetime = new \DateTime("-1 year");
+        }else if($time == "this_year"){
             $datetime = new \DateTime("-1 week");
-            $time = $datetime->format(\DateTime::RFC3339);
         }
+        $time = $datetime->format(\DateTime::RFC3339);
         $options = array(
             "type" => "video",
             "maxResults" => $maxResults,
@@ -70,15 +72,14 @@ class Youtube implements ServiceManagerAwareInterface
         return new Video($videoList['items'][0]);
     }
 
-    public function findPlaylistById($id,$maxResults = 50){
-        $playlistItems = $this->youtube->playlistItems->listPlaylistItems('snippet',array(
+    public function findPlaylistById($id,$maxResults = 50,$pageToken = null){
+        $params = array(
             'playlistId' => $id,
             'maxResults' => $maxResults
-        ));
-        $videos = array();
-        foreach($playlistItems["items"] as $item)
-            $videos[] = new Video($item, "playlistItem");
-        return $videos;
+        );
+        if($pageToken) $params['pageToken'] = $pageToken;
+        $playlistItems = $this->youtube->playlistItems->listPlaylistItems('snippet',$params);
+        return new PlaylistItems($playlistItems);
     }
 
     public function findChannelById($id)

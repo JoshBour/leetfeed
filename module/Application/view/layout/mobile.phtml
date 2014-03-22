@@ -5,23 +5,11 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
 ?>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
     <?php echo $this->headTitle($pageTitle); ?>
 
     <?php
-    if (isset($child->ogTags)) {
-        $ogTitle = $child->ogTags["title"];
-        $ogUrl = $child->ogTags["url"];
-        $ogImage = $child->ogTags["image"];
-        $ogDescription = $child->ogTags["description"];
-    } else {
-        $ogTitle = "Leetfeed - Best Video Generator";
-        $ogUrl = "http://www.leetfeed.com";
-        $ogImage = 'http://i.imgur.com/IMuF0ng.jpg';
-        $ogDescription = "Leetfeed is a league of legends video generator.";
-    }
-
-    echo $this->headMeta()
+    $this->headMeta()
+        ->setCharset('UTF-8')
         ->appendName('viewport', 'width=device-width, initial-scale=1.0')
         ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
         ->appendName('description', 'Leetfeed is a league of legends random video generator site.')
@@ -29,38 +17,60 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
         ->appendName('robots', 'feed, follow')
         ->appendName('language', 'en')
         ->appendName('googlebot', 'feed, follow, archive')
-        ->appendProperty('og:title', $ogTitle)
+        ->appendProperty("og:site_name", "Leetfeed");
+    if (isset($child->ogTags)) {
+        $ogTitle = $child->ogTags["title"];
+        $ogUrl = $child->ogTags["url"];
+        $ogImage = $child->ogTags["image"];
+        $ogDescription = $child->ogTags["description"];
+        $this->headMeta()
+            ->appendProperty('og:video', $child->ogTags["video"])
+            ->appendProperty('og:video:type', "application/x-shockwave-flash")
+            ->appendProperty('og:video:width', "965")
+            ->appendProperty('og:video:height', "576");
+    } else {
+        $ogTitle = "Leetfeed - Best Video Generator";
+        $ogUrl = "http://www.leetfeed.com";
+        $ogImage = 'http://i.imgur.com/IMuF0ng.jpg';
+        $ogDescription = "Leetfeed is a league of legends video generator.";
+    }
+    $this->headMeta()->appendProperty('og:title', $ogTitle)
         ->appendProperty('og:type', "website")
         ->appendProperty('og:url', $ogUrl)
         ->appendProperty('og:description', $ogDescription)
         ->appendProperty('og:image', $ogImage)
-        ->appendProperty('fb:app_id', 268335233334900)
-        ->appendProperty('fb:admins', 1124061431);
+        ->appendProperty('fb:app_id', '268335233334900')
+        ->appendProperty('fb:admins', '1124061431');
+
+    echo $this->headMeta();
     ?>
 
     <!-- Styles -->
     <?php $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath('images/favicon.ico')))
         ->prependStylesheet($this->basePath('css/style.css'));
-        if(isset($child->includeProgressBar)){
-            $this->headLink()->prependStylesheet($this->basePath('css/ui.progress-bar.min.css'));
-        }
-        $this->headLink()->appendStylesheet($this->basePath('css/mobile.css'),'only screen and (max-width: 800px)');
-        echo $this->headLink();
+    if (isset($child->includeProgressBar)) {
+        $this->headLink()->prependStylesheet($this->basePath('css/ui.progress-bar.min.css'));
+    }
+    $this->headLink()->appendStylesheet($this->basePath('css/mobile.css'),'only screen and (max-width: 800px)');
+    echo $this->headLink();
     ?>
 
     <!-- Scripts -->
     <?php
-        $this->headScript()
-        ->prependFile($this->basePath('js/lib.min.js'))
+    $this->headScript()
+        ->prependFile($this->basePath('js/lib.js'))
         ->prependFile($this->basePath('js/jquery.mousewheel.min.js'))
         ->prependFile($this->basePath('js/perfect-scrollbar.min.js'))
         ->prependFile($this->basePath('js/respond.min.js'), 'text/javascript', array('conditional' => 'lt IE 9',))
         ->prependFile($this->basePath('js/html5shiv.js'), 'text/javascript', array('conditional' => 'lt IE 9',))
         ->prependFile($this->basePath('js/jquery.min.js'));
-        if(isset($child->includeProgressBar)){
-            $this->headScript()->appendFile($this->basePath('js/progress.min.js'));
-        }
-        echo $this->headScript();
+    if (isset($child->includeProgressBar)) {
+        $this->headScript()->appendFile($this->basePath('js/progress.min.js'));
+    }
+    if (isset($child->includeAjaxForm)) {
+        $this->headScript()->appendFile($this->basePath('js/jquery.form.min.js'));
+    }
+    echo $this->headScript();
     ?>
     <script>
         var baseUrl = '<?php echo $this->basePath(); ?>';
@@ -68,10 +78,17 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
     </script>
     <script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
     <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
         ga('create', 'UA-48935331-1', 'leetfeed.com');
         ga('send', 'pageview');
@@ -103,6 +120,7 @@ if (!empty($messages)) :
             <a href="<?php echo $this->url('home'); ?>"
                title="<?php echo $this->translate("Leetfeed"); ?>">Logo</a>
         </div>
+        <img id="mobileMenuToggle" src="<?php echo $this->basePath("images/menu-button.png"); ?>" />
         <nav>
             <ul>
                 <li>
@@ -111,7 +129,7 @@ if (!empty($messages)) :
                 <li>
                     <a href="<?php echo $this->url("famous"); ?>" title="Feeds by famous people">Famous</a>
                 </li>
-                <?php if(!$this->identity()): ?>
+                <?php if (!$this->identity()): ?>
                     <li>
                         <a href="<?php echo $this->url("login"); ?>" title="Login to Leetfeed">Login</a>
                     </li>
@@ -119,51 +137,63 @@ if (!empty($messages)) :
                         <a href="<?php echo $this->url("register"); ?>" title="Register to Leetfeed">Register</a>
                     </li>
                 <?php else: ?>
+                    <li>
+                        <a href="<?php echo $this->url("improve"); ?>" title="Feeds to improve your skills!">Improve</a>
+                    </li>
                     <li id="userNav">
                         <a href="#"
                            title="<?php echo $this->translate("My Profile"); ?>" id="navToggle">
 
                             <?php echo ucfirst($this->identity()->getUsername()); ?>
                         </a>
-                        <ul id="submenu">
-                            <li>
-                                <a href="<?php echo $this->url("leet"); ?>" title="Feeds you marked as Leet">Leet</a>
-                            </li>
-                            <li>
-                                <a href="<?php echo $this->url("history"); ?>" title="Your feed history">History</a>
-                            </li>
-                            <li>
-                                <a href="<?php echo $this->url("logout"); ?>" title="Logout from Leetfeed">Logout</a>
-                            </li>
-                        </ul>
                     </li>
-
+                    <li>
+                        <a href="<?php echo $this->url("account/summoners"); ?>"
+                           title="Your account's summoners">Summoners</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $this->url("leet"); ?>" title="Feeds you marked as Leet">Leet</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $this->url("history"); ?>" title="Your feed history">History</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $this->url("logout"); ?>" title="Logout from Leetfeed">Logout</a>
+                    </li>
                 <?php endif; ?>
             </ul>
         </nav>
     </div>
 </header>
 <div id="content">
+    <?php if (!isset($_COOKIE['shownAnnouncement'])): ?>
+        <div id="announcement" class="module">
+            <p>Are you going to be our new facebook page moderator? Feel free to apply at our <a
+                    href="<?php echo $this->url('contact'); ?>">contact page</a> using the subject title "Facebook
+                Application"!</p>
+
+            <div class="remove">X</div>
+        </div>
+    <?php endif; ?>
     <?php echo $this->content; ?>
 </div>
 <footer>
     <p>&copy; Leetfeed <?php echo date('Y') ?>
-        <a href="http://www.facebook.com/leetfeed" target="_blank"><img src="<?php echo $this->basePath('images/fb-icon-24x24.png'); ?>" /></a>
-        <a href="http://www.twitter.com/leetfeed" target="_blank"><img src="<?php echo $this->basePath('images/twitter-icon-24x24.png'); ?>" /></a></p>
     <nav>
         <ul>
-            <li> <a href="<?php echo $this->url("faq"); ?>">FAQ</a></li>
-            <li> <a href="<?php echo $this->url("promote"); ?>">Promote</a></li>
-            <li> <a href="<?php echo $this->url("contact"); ?>">Contact</a></li>
+            <li><a href="<?php echo $this->url("faq"); ?>">FAQ</a></li>
+            <li><a href="<?php echo $this->url("promote"); ?>">Promote</a></li>
+            <li><a href="<?php echo $this->url("contact"); ?>">Contact</a></li>
         </ul>
     </nav>
 </footer>
 <?php echo $this->inlineScript()->prependFile($this->basePath('js/main-1.0.0.js'), 'text/javascript'); ?>
 <div id="fb-root"></div>
-<script>(function(d, s, id) {
+<script>(function (d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
+        js = d.createElement(s);
+        js.id = id;
         js.async = true;
         js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=268335233334900";
         fjs.parentNode.insertBefore(js, fjs);

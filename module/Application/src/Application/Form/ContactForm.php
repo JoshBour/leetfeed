@@ -25,7 +25,7 @@ class ContactForm extends Form
         ));
 
         $this->setValidationGroup(array(
-       #     'security',
+            'security',
             'contact' => array('sender',
             'subject',
             'body')

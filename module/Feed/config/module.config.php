@@ -58,6 +58,16 @@ return array(
                     ),
                 ),
             ),
+            'improve' => array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route' => '/improve[/:summonerId]',
+                    'defaults' => array(
+                        'controller' => 'Feed\Controller\Feed',
+                        'action' => 'improve',
+                    ),
+                ),
+            ),
             'feed' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
@@ -117,9 +127,11 @@ return array(
                     'get-youtuber-feeds' => array(
                         'type' => 'Zend\Mvc\Router\Http\Segment',
                         'options' => array(
-                            'route' => '/get-youtuber-feeds/:youtuberName',
+                            'route' => '/get-youtuber-feeds/:youtuberName[/:returnFeeds[/:nextToken]]',
                             'defaults' => array(
                                 'action' => 'get-youtuber-feeds',
+                                'nextToken' => null,
+                                'returnFeeds' => null,
                             ),
                         ),
                     ),

@@ -1,0 +1,78 @@
+<div id="main">
+    <div class="module semiTransparentBackground halfSized">
+        <h1>League of Legends Accounts</h1>
+
+        <div class="moduleBody">
+            <?php if ($summoners->count() > 0): ?>
+                <ul class="summoners">
+                    <?php foreach ($summoners as $summoner): ?>
+                        <li class="summoner-<?php echo $summoner->getSummonerId(); ?>">
+                            <a href="<?php echo $this->url('improve', array('summonerId' => $summoner->getSummonerId())); ?>" title="Improve using champions from <?php echo $summoner->getName(); ?>">
+                                <div class="summonerBody">
+                                    <span class="author"><?php echo $summoner->getName(); ?></span>
+                                    <?php echo ' on ' . strtoupper($summoner->getRegion()); ?>
+                                </div>
+                                <div class="summonerChampions">
+                                    Last Played:
+                                    <?php
+                                    $champions = $leagueService->getLatestChampions($summoner);
+                                    if (!empty($champions)) {
+                                        $championNames = join(',',$champions);
+                                        echo $championNames;
+                                    } else {
+                                        echo "None";
+                                    }
+                                    ?>
+                                </div>
+                            </a>
+
+                            <div class="summonerMeta">X</div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <div class="empty">You haven't added a League of Legends account yet! Add one using the button
+                    on the right.
+                </div>
+            <?php endif ?>
+            <?php if ($summoners->count() < 10): ?>
+                <div id="addSummonerToggle">Add +</div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php if ($summoners->count() < 10): ?>
+    <div id="addSummoner">
+        <h3>Add a new League of Legends account</h3>
+        <?php
+        $form->prepare();
+        $form->setAttribute('action', $this->url('account/summoners'));
+        $fieldset = $form->get('summoner');
+
+        echo $this->form()->openTag($form);
+        echo $this->formHidden($form->get('security'));
+        ?>
+        <div class="element">
+            <?php
+            echo $this->formElementErrors($fieldset->get('name'), array('class' => 'formError'));
+            echo $this->formLabel($fieldset->get('name'));
+            echo $this->formInput($fieldset->get('name'));
+            ?>
+        </div>
+
+        <div class="element">
+            <?php
+            echo $this->formElementErrors($fieldset->get('region'), array('class' => 'formError'));
+            echo $this->formLabel($fieldset->get('region'));
+            echo $this->formSelect($fieldset->get('region'));
+            ?>
+        </div>
+
+
+        <div class="element">
+            <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Submit'))); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag() ?>
+    </div>
+<?php endif; ?>

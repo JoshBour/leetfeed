@@ -9,16 +9,29 @@
 namespace Feed\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\ResultSetMapping;
-use Zend\Paginator\Paginator;
 use Zend\Paginator\Adapter\ArrayAdapter;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Zend\Paginator\Paginator;
 
 
-class FeedRepository extends EntityRepository{
+class FeedRepository extends EntityRepository
+{
+    public function countFeeds($related = null)
+    {
+        $query = $this->createQueryBuilder('f')
+            ->select('COUNT(f.feedId)');
+        if ($related != null) {
+            $query = $query->where('f.isRelated = :related')
+                ->setParameter("related", $related);
+        }
+        $query = $query->getQuery();
+        return $query->getSingleScalarResult();
+
+
+    }
+
     public function findFeedsByDate($account, $date = 'now', $firstResults = 0)
     {
-        switch($date){
+        switch ($date) {
             case "now":
                 $datetime = new \DateTime("today");
                 break;
@@ -41,7 +54,7 @@ class FeedRepository extends EntityRepository{
         $time = $datetime->format("Y-m-d H:i:s");
         $qb = $this->createQueryBuilder('f');
         $qb->select('f')
-            ->add('from','Feed\Entity\Feed f LEFT JOIN f.watchedHistory wh')
+            ->add('from', 'Feed\Entity\Feed f LEFT JOIN f.watchedHistory wh')
             ->where($qb->expr()->gte('wh.watchTime', '?1'))
             ->andWhere($qb->expr()->eq('wh.account', '?2'))
             ->setParameters(array("1" => $time, "2" => $account))

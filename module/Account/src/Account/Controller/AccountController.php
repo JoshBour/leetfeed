@@ -5,6 +5,7 @@ use Account\Entity\Account;
 use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class AccountController extends AbstractActionController
@@ -16,24 +17,16 @@ class AccountController extends AbstractActionController
     const ROUTE_AUTHENTICATE = 'authenticate';
     const ROUTE_HOMEPAGE = 'home';
 
+    const TEMPLATE_SUMMONERS_AJAX = "account/account/summoners.ajax.phtml";
+
     const MESSAGE_ACCOUNT_CREATED = 'Your account has been created successfully!';
     const MESSAGE_INVALID_CREDENTIALS = 'The username/password combination is invalid.';
     const MESSAGE_ALREADY_LOGGED = "You are already logged in!";
     const MESSAGE_LOGOUT_TO_REGISTER = "You have to logout in order to register a new account!";
-
-    /**
-     * The login form.
-     *
-     * @var Form
-     */
-    private $loginForm = null;
-
-    /**
-     * The register form.
-     *
-     * @var Form
-     */
-    private $registerForm = null;
+    const MESSAGE_SUMMONER_ADDED = "The summoner has been added successfully!";
+    const MESSAGE_REMOVED_SUMMONER = "The summoner has been removed successfully!";
+    const ERROR_SUMMONER_NOT_FOUND = "The summoner was not found, please verify the info and try again!";
+    const ERROR_REMOVE_SUMMONER = "There was an error when removing the summoner, please try again!";
 
     /**
      * The account service.
@@ -64,29 +57,135 @@ class AccountController extends AbstractActionController
     private $entityManager;
 
     /**
+     * The league service.
+     *
+     * @var \League\Service\League
+     */
+    private $leagueService;
+
+    /**
+     * The login form.
+     *
+     * @var Form
+     */
+    private $loginForm = null;
+
+    /**
+     * The register form.
+     *
+     * @var Form
+     */
+    private $registerForm = null;
+
+
+    /**
+     * The summoner form
+     *
+     * @var Form
+     */
+    private $summonerForm;
+
+    /**
      * The zend translator.
      *
      * @var \Zend\I18n\Translator\Translator
      */
     private $translator;
 
+
     /**
-     * The login action.
+     * The summoners action
+     * Route: /summoners
      *
-     * @return mixed|\Zend\Http\Response|ViewModel
+     * @return JsonModel|ViewModel
+     */
+    public function summonersAction()
+    {
+        if ($this->identity()) {
+            /**
+             * @var $request \Zend\Http\Request
+             */
+            $request = $this->getRequest();
+            if ($request->isXmlHttpRequest()) {
+                $viewModel = new ViewModel();
+                $viewModel->setTerminal(true);
+                $viewModel->setTemplate(self::TEMPLATE_SUMMONERS_AJAX);
+                $form = $this->getSummonerForm();
+                $data = $request->getPost();
+                $form->setData($data);
+                if ($form->isValid()) {
+                    if ($this->getAccountService()->addSummoner($data)) {
+                        $this->flashMessenger()->addMessage(self::MESSAGE_SUMMONER_ADDED);
+                        return new JsonModel(array(
+                            "redirect" => true
+                        ));
+                    } else {
+                        $viewModel->setVariable("error", self::ERROR_SUMMONER_NOT_FOUND);
+                    }
+                }
+                $viewModel->setVariable("form", $form);
+                return $viewModel;
+            } else {
+                return new ViewModel(array(
+                    "summoners" => $this->account()->getSummoners(),
+                    "form" => $this->getSummonerForm(),
+                    'leagueService' => $this->getLeagueService(),
+                    "includeAjaxForm" => true,
+                ));
+            }
+        }else{
+            return $this->notFoundAction();
+        }
+    }
+
+    /**
+     * The remove summoner action.
+     * Only accessed via xmlHttpRequest.
+     * Route: /account/remove-summoner
+     *
+     * @return JsonModel
+     */
+    public function removeSummonerAction()
+    {
+        if ($this->getRequest()->isXmlHttpRequest() && $this->identity()) {
+            $summonerId = $this->params()->fromPost("summonerId", null);
+            $success = 0;
+            if ($this->getAccountService()->removeSummoner($summonerId)) {
+                $success = 1;
+                $message = self::MESSAGE_REMOVED_SUMMONER;
+            } else {
+                $message = self::ERROR_REMOVE_SUMMONER;
+            }
+            return new JsonModel(array(
+                "success" => $success,
+                "message" => $message
+            ));
+        }else{
+            return $this->notFoundAction();
+        }
+    }
+
+    /**
+     * The login action
+     * Route: /login
+     *
+     * @return mixed|ViewModel
      */
     public function loginAction()
     {
         if (!$this->identity()) {
             $entity = new Account();
             $loginForm = $this->getLoginForm();
+            /**
+             * @var $request \Zend\Http\Request
+             */
             $request = $this->getRequest();
             $loginForm->bind($entity);
             if ($request->isPost()) {
                 $data = $request->getPost();
                 $loginForm->setData($data);
                 if ($loginForm->isValid()) {
-                    $redirectUrl = $this->params()->fromRoute("redirectUrl",null);
+                    $redirectUrl = $this->params()->fromRoute("redirectUrl", null);
                     return $this->forward()->dispatch(static::CONTROLLER_NAME, array('action' => 'authenticate',
                         'username' => $entity->getUsername(),
                         'password' => $entity->getPassword(),
@@ -105,6 +204,7 @@ class AccountController extends AbstractActionController
 
     /**
      * The logout action
+     * Route: /logout
      *
      * @return \Zend\Http\Response
      */
@@ -119,13 +219,17 @@ class AccountController extends AbstractActionController
 
     /**
      * The register action.
+     * Route: /register
      *
-     * @return mixed|\Zend\Http\Response|ViewModel
+     * @return mixed|ViewModel
      */
     public function registerAction()
     {
         if (!$this->identity()) {
             $service = $this->getAccountService();
+            /**
+             * @var $request \Zend\Http\Request
+             */
             $request = $this->getRequest();
             $form = $this->getRegisterForm();
             $data = $request->getPost();
@@ -137,8 +241,8 @@ class AccountController extends AbstractActionController
                             'username' => $account->getUsername(),
                             'password' => $data['account']['password'])
                     );
-                }else{
-                    if(\Account\Service\Account::$error){
+                } else {
+                    if (\Account\Service\Account::$error) {
                         $this->flashMessenger()->addMessage(\Account\Service\Account::$error);
                         return $this->redirect()->toRoute(self::ROUTE_REGISTER);
                     }
@@ -155,12 +259,16 @@ class AccountController extends AbstractActionController
 
     /**
      * The authentication action.
+     * Only accessed from the login and register actions.
      *
      * @return \Zend\Http\Response
      */
     public function authenticateAction()
     {
         $authService = $this->getAuthenticationService();
+        /**
+         * @var $adapter \Zend\Authentication\Adapter\AbstractAdapter
+         */
         $adapter = $authService->getAdapter();
 
         $remember = $this->params()->fromRoute('remember', 1);
@@ -176,16 +284,16 @@ class AccountController extends AbstractActionController
                 $authService->setStorage($this->getAuthStorage());
             }
             $identity = $authResult->getIdentity();
-            $this->getAccountService()->updateLastSeen($identity,true);
+            $this->getAccountService()->updateLastSeen($identity, true);
             $authService->getStorage()->write($identity);
         } else {
             $this->flashMessenger()->addMessage($this->getTranslator()->translate(self::MESSAGE_INVALID_CREDENTIALS));
             return $this->redirect()->toRoute(self::ROUTE_LOGIN);
         }
-        if($redirectUrl){
-            $redirectUrl = str_replace('__','/',$redirectUrl);
-            return $this->redirect()->toUrl('/'.$redirectUrl);
-        }else{
+        if ($redirectUrl) {
+            $redirectUrl = str_replace('__', '/', $redirectUrl);
+            return $this->redirect()->toUrl('/' . $redirectUrl);
+        } else {
             return $this->redirect()->toRoute(self::ROUTE_HOMEPAGE);
         }
     }
@@ -198,121 +306,9 @@ class AccountController extends AbstractActionController
     public function getAccountService()
     {
         if (null === $this->accountService) {
-            $this->setAccountService($this->getServiceLocator()->get('account_service'));
+            $this->accountService = $this->getServiceLocator()->get('account_service');
         }
         return $this->accountService;
-    }
-
-    /**
-     * Set the account service
-     *
-     * @param \Account\Service\Account $accountService
-     * @return AccountController
-     */
-    public function setAccountService($accountService)
-    {
-        $this->accountService = $accountService;
-        return $this;
-    }
-
-    /**
-     * Retrieve the account login form
-     *
-     * @return Form
-     */
-    public function getLoginForm()
-    {
-        if (null === $this->loginForm) {
-            $this->setLoginForm($this->getServiceLocator()->get('account_login_form'));
-        }
-        return $this->loginForm;
-    }
-
-    /**
-     * Set the account login form
-     *
-     * @param Form $loginForm
-     * @return AccountController
-     */
-    public function setLoginForm($loginForm)
-    {
-        $this->loginForm = $loginForm;
-        return $this;
-    }
-
-    /**
-     * Retrieve the account register form
-     *
-     * @return Form
-     */
-    public function getRegisterForm()
-    {
-        if (null === $this->registerForm) {
-            $this->setRegisterForm($this->getServiceLocator()->get('account_register_form'));
-        }
-        return $this->registerForm;
-    }
-
-    /**
-     * Set the account register form
-     *
-     * @param Form $registerForm
-     * @return AccountController
-     */
-    public function setRegisterForm($registerForm)
-    {
-        $this->registerForm = $registerForm;
-        return $this;
-    }
-
-    /**
-     * Retrieve the doctrine entity manager
-     *
-     * @return \Doctrine\ORM\EntityManager
-     */
-    public function getEntityManager()
-    {
-        if (null === $this->entityManager) {
-            $this->setEntityManager($this->getServiceLocator()->get('Doctrine\ORM\EntityManager'));
-        }
-        return $this->entityManager;
-    }
-
-    /**
-     * Set the doctrine entity manager
-     *
-     * @param \Doctrine\ORM\EntityManager $em
-     * @return $this
-     */
-    public function setEntityManager($em)
-    {
-        $this->entityManager = $em;
-        return $this;
-    }
-
-    /**
-     * Retrieve the translator
-     *
-     * @return \Zend\I18n\Translator\Translator
-     */
-    public function getTranslator()
-    {
-        if (null === $this->translator) {
-            $this->setTranslator($this->getServiceLocator()->get('translator'));
-        }
-        return $this->translator;
-    }
-
-    /**
-     * Set the translator
-     *
-     * @param \Zend\I18n\Translator\Translator $translator
-     * @return AccountController
-     */
-    public function setTranslator($translator)
-    {
-        $this->translator = $translator;
-        return $this;
     }
 
     /**
@@ -323,21 +319,9 @@ class AccountController extends AbstractActionController
     public function getAuthenticationService()
     {
         if (null === $this->authService) {
-            $this->setAuthenticationService($this->getServiceLocator()->get('auth_service'));
+            $this->authService = $this->getServiceLocator()->get('auth_service');
         }
         return $this->authService;
-    }
-
-    /**
-     * Set the authentication service
-     *
-     * @param AuthenticationService $authService
-     * @return AccountController
-     */
-    public function setAuthenticationService($authService)
-    {
-        $this->authService = $authService;
-        return $this;
     }
 
     /**
@@ -348,20 +332,87 @@ class AccountController extends AbstractActionController
     public function getAuthStorage()
     {
         if (null === $this->authStorage) {
-            $this->setAuthStorage($this->getServiceLocator()->get('authStorage'));
+            $this->authStorage = $this->getServiceLocator()->get('authStorage');
         }
         return $this->authStorage;
     }
 
     /**
-     * Set the auth storage
+     * Retrieve the doctrine entity manager
      *
-     * @param \Account\Model\AuthStorage $authStorage
-     * @return AccountController
+     * @return \Doctrine\ORM\EntityManager
      */
-    public function setAuthStorage($authStorage)
+    public function getEntityManager()
     {
-        $this->authStorage = $authStorage;
-        return $this;
+        if (null === $this->entityManager) {
+            $this->entityManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
+        }
+        return $this->entityManager;
     }
+
+    /**
+     * Retrieve the league service
+     *
+     * @return \League\Service\League
+     */
+    public function getLeagueService()
+    {
+        if (null === $this->leagueService) {
+            $this->leagueService = $this->getServiceLocator()->get('league_service');
+        }
+        return $this->leagueService;
+    }
+
+    /**
+     * Retrieve the account login form
+     *
+     * @return Form
+     */
+    public function getLoginForm()
+    {
+        if (null === $this->loginForm) {
+            $this->loginForm = $this->getServiceLocator()->get('account_login_form');
+        }
+        return $this->loginForm;
+    }
+
+    /**
+     * Retrieve the account register form
+     *
+     * @return Form
+     */
+    public function getRegisterForm()
+    {
+        if (null === $this->registerForm) {
+            $this->registerForm = $this->getServiceLocator()->get('account_register_form');
+        }
+        return $this->registerForm;
+    }
+
+    /**
+     * Retrieve the summoner form
+     *
+     * @return Form
+     */
+    public function getSummonerForm()
+    {
+        if (null === $this->summonerForm) {
+            $this->summonerForm = $this->getServiceLocator()->get('summoner_form');
+        }
+        return $this->summonerForm;
+    }
+
+    /**
+     * Retrieve the translator
+     *
+     * @return \Zend\I18n\Translator\Translator
+     */
+    public function getTranslator()
+    {
+        if (null === $this->translator) {
+            $this->translator = $this->getServiceLocator()->get('translator');
+        }
+        return $this->translator;
+    }
+
 }

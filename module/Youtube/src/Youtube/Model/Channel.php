@@ -9,7 +9,8 @@
 namespace Youtube\Model;
 
 
-class Channel {
+class Channel
+{
     private $id;
 
     private $title;
@@ -28,7 +29,8 @@ class Channel {
 
     private $videoCount;
 
-    public function __construct($channel){
+    public function __construct($channel)
+    {
         $this->id = $channel["id"];
         $this->title = $channel["snippet"]["title"];
         $this->description = $channel["snippet"]["description"];
@@ -41,6 +43,13 @@ class Channel {
         $this->viewCount = $channel["statistics"]["viewCount"];
         $this->subscriberCount = $channel["statistics"]["subscriberCount"];
         $this->videoCount = $channel["statistics"]["videoCount"];
+    }
+
+    public function getUploadsPlaylist($max = 50, $token = null)
+    {
+        $yt = new \Youtube\Service\Youtube();
+        $playlistItems = $yt->findPlaylistById($this->uploadsPlaylistId, $max, $token);
+        return $playlistItems;
     }
 
     /**
@@ -124,12 +133,18 @@ class Channel {
     }
 
     /**
+     * @param int $max
+     * @param null $token
      * @return array
      */
-    public function getUploads(){
-        if(null === $this->uploads){
+    public function getUploads($max = 50, $token = null)
+    {
+        if (null === $this->uploads) {
             $yt = new \Youtube\Service\Youtube();
-            $this->uploads = $yt->findPlaylistById($this->uploadsPlaylistId);
+            $playlistItems = $yt->findPlaylistById($this->uploadsPlaylistId, $max, $token);
+            foreach ($playlistItems->getVideos() as $video) {
+                $this->uploads[] = $video;
+            }
         }
         return $this->uploads;
     }

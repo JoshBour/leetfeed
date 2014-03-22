@@ -1,0 +1,16 @@
+<div id="main">
+    <div class="module semiTransparentBackground">
+        <h1>Test Page</h1>
+
+        <div class="moduleBody">
+            <ul data-page="1" id="top-feeds"
+                class="verticalFeedList">
+                <?php
+                foreach ($feeds as $feed) {
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                }
+                ?>
+            </ul>
+        </div>
+    </div>
+</div>

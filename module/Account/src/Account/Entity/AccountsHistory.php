@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class AccountsHistory
  * @package Account\Entity
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="\Account\Repository\AccountsHistoryRepository")
  * @ORM\Table(name="accounts_feeds")
  */
 class AccountsHistory {

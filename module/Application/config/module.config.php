@@ -46,13 +46,13 @@ return array(
                     ),
                 ),
             ),
-//            'about' => array(
+//            'test' => array(
 //                'type' => 'Zend\Mvc\Router\Http\Literal',
 //                'options' => array(
-//                    'route'    => '/about',
+//                    'route'    => '/test',
 //                    'defaults' => array(
 //                        'controller' => 'Application\Controller\Index',
-//                        'action'     => 'about',
+//                        'action'     => 'test',
 //                    ),
 //                ),
 //            ),
@@ -70,14 +70,8 @@ return array(
     ),
     'service_manager' => array(
         'factories' => array(
-            'contact_form' => function ($sm) {
-                    $fieldset = new Form\ContactFieldset($sm->get('translator'));
-                    $form = new Form\ContactForm();
-
-                    $form->add($fieldset)
-                        ->setInputFilter(new InputFilter());
-                    return $form;
-                },
+            'contact_form' => 'Application\Factory\ContactFormFactory',
+            'cache_service' => 'Zend\Cache\Service\StorageCacheFactory'
         ),
 //        'abstract_factories' => array(
 //            'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
