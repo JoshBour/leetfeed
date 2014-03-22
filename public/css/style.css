@@ -73,11 +73,16 @@
         font-size: 12px;
         line-height:1;
     }
+    h1, h2, h3{margin: 5px 0; text-align:center; font-size:1.15em;}
 
     h1 {color: #c4c4c4; border-bottom: 1px solid #797979;}
     h2 {color: #fff;}
-    h3 {color: #405B65}
-    h1, h2, h3{margin: 5px 0; text-align:center; font-size:1.15em;}
+    h3 {
+        font:bold 14px Arial;
+        border-bottom: 1px solid #444;
+        padding-bottom: 10px;
+        color: #fff;
+    }
 
     strong {font-weight: bold;}
 
@@ -293,6 +298,29 @@
         text-decoration:none;
     }
 
+    #announcement {
+        width: 979px;
+        margin: 20px auto 0 auto;
+        padding: 10px;
+        overflow:auto;
+        text-align: center;
+        background:rgba(0,0,0,0.8);
+    }
+
+    #announcement p{
+        display:inline;
+    }
+
+    #announcement .remove{
+        float: right;
+        cursor:pointer;
+        color:#aaa;
+    }
+
+#announcement .remove:hover{
+    color:#fff;
+}
+
     /* ===================================================== */
     /*                      Index Page                       */
 
@@ -425,13 +453,13 @@
 
     /* ===================================================== */
     /*                     History Page                       */
-        #historySort{
+        .moduleSort, #addSummonerToggle{
             position: absolute;
             right: 0;
             top: 0;
         }
 
-        #historySort select{
+        .moduleSort select{
             padding: 11px 11px 10px 11px;
             border: none;
             margin: 0;
@@ -496,7 +524,94 @@
             height:88px;
         }
 
+    /* ===================================================== */
+    /*                     Settings Page                       */
 
+        #addSummoner{
+            display:none;
+            width:380px;
+            position: absolute;
+            background: #050505;
+            border: 1px solid #333;
+            top: 10%;
+            left: 50%;
+            margin-left: -190px;
+        }
+
+        #addSummoner h3{
+            padding: 12px;
+            margin: 0;
+            font:normal 18px 'Gafata', sans-serif;
+            background: #333 url(../images/flash-bg.png) 50% 50%;
+        }
+
+        #addSummonerToggle{
+            cursor:pointer;
+            padding: 10px;
+            background: #111;
+            border-left: 1px solid #333;
+        }
+
+        #addSummonerToggle:hover{
+            background:#222;
+        }
+
+        #addSummoner input, #addSummoner select{
+            width:100%;
+            display:block;
+            margin-left:0;
+            padding:10px 0;
+            text-indent: 10px;
+        }
+
+        #addSummoner input[type="submit"]{
+            text-indent: 0;
+            width:100px;
+        }
+
+        #summonerForm{
+            padding:10px;
+            margin:20px;
+        }
+
+        #summonerForm label{
+            width:auto;
+        }
+
+        ul.summoners li{
+            padding: 10px;
+            overflow:hidden;
+            margin: 5px 0;
+            position:relative;
+            background: #111;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            text-align:left;
+        }
+
+        ul.summoners a{
+            color:inherit;
+        }
+
+        ul.summoners a:hover{
+            text-decoration: none;
+        }
+
+        ul.summoners li:hover{
+            border-left: 2px solid #666;
+
+        }
+
+        ul.summoners .author{
+            font-size:18px;
+        }
+
+        ul.summoners li .summonerMeta{
+            cursor:pointer;
+            position: absolute;
+            right: 1%;
+            top: 35%;
+        }
 
     /* ===================================================== */
     /*                    youtube   View                       */
@@ -531,7 +646,7 @@
         /* ===================================================== */
         /*                    Comment List                      */
 
-            .emptyComments{
+            .empty, .emptyComments{
                 padding: 10px;
                 margin: 20px 0;
                 text-align: center;
@@ -643,7 +758,7 @@
         .module h1{
             display: block;
             margin-top:0;
-            font:normal 18px 'Gafata', sans-serif;;
+            font:normal 18px 'Gafata', sans-serif;
             color: white;
             background: #333 url(../images/flash-bg.png) 50% 50%;
             border-bottom: 1px solid #333;
@@ -740,6 +855,10 @@
         padding:20px;
     }
 
+    .error{
+        color:red;
+    }
+
 
 
 /* ===================================================== */
@@ -792,6 +911,7 @@
     .edit, .delete, .save, .cancel, .ban, .unban {cursor: pointer;}
     .centered{margin: 0 auto;}
     .author{color:#448197}
+    .author:hover{color:#5EB3D1}
     .unscrollable{overflow:hidden;}
     .centered{text-align:center;}
     .shortened{max-height:500px;}
