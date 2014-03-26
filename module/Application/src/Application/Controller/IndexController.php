@@ -199,7 +199,9 @@ class IndexController extends AbstractActionController
      */
     public function faqAction()
     {
-        return new ViewModel();
+        return new ViewModel(array(
+            "pageTitle" => "Frequently Asked Questions"
+        ));
     }
 
     /**
@@ -210,7 +212,9 @@ class IndexController extends AbstractActionController
      */
     public function promoteAction()
     {
-        return new ViewModel();
+        return new ViewModel(array(
+            "pageTitle" => "Promote your feeds!"
+        ));
     }
 
     /**
@@ -260,7 +264,8 @@ class IndexController extends AbstractActionController
 
         }
         return new ViewModel(array(
-            "form" => $form
+            "form" => $form,
+            "pageTitle" => "Contact Us"
         ));
     }
 

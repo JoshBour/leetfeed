@@ -131,6 +131,7 @@ class AccountController extends AbstractActionController
                     "form" => $this->getSummonerForm(),
                     'leagueService' => $this->getLeagueService(),
                     "includeAjaxForm" => true,
+                    "pageTitle" => "Your League of Legends summoners"
                 ));
             }
         }else{
@@ -195,6 +196,7 @@ class AccountController extends AbstractActionController
             }
             return new ViewModel(array(
                 'form' => $loginForm,
+                "pageTitle" => "Login to your account"
             ));
         } else {
             $this->flashMessenger()->addMessage($this->getTranslator()->translate(self::MESSAGE_ALREADY_LOGGED));
@@ -250,6 +252,7 @@ class AccountController extends AbstractActionController
             }
             return new ViewModel(array(
                 'form' => $form,
+                "pageTitle" => "Register a new account"
             ));
         } else {
             $this->flashMessenger()->addMessage($this->getTranslator()->translate(self::MESSAGE_LOGOUT_TO_REGISTER));

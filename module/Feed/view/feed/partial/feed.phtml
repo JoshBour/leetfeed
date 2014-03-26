@@ -4,7 +4,7 @@ if ($isPremium) {
 }
 $feedId = $feed->getFeedId();
 $title = $this->escapeHtml(substr($feed->getTitle(), 0, 80));
-$description = strlen($feed->getDescription()) > 100 ? substr($feed->getDescription(), 0, 100) . ".." : $feed->getDescription();
+$description = $feed->getCleanDescription(100);
 ?>
 <li class="feed-<?php echo $feedId; ?>" data-video-id="<?php echo $feed->getVideoId(); ?>">
     <div class="feedThumbnail">

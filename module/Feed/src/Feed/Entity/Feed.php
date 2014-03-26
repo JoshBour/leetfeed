@@ -118,9 +118,9 @@ class Feed {
         $feed = new Feed();
         $feed->setGame($game);
         $feed->setVideoId($videoId);
-        $feed->setTitle($title);
+        $feed->setTitle(htmlentities($title));
         $feed->setAuthor($author);
-        $feed->setDescription($description);
+        $feed->setDescription(htmlentities($description));
         $feed->setRating(0);
         $feed->setIsRising($rising);
         $feed->setIsRelated($related);
@@ -135,6 +135,20 @@ class Feed {
         $this->relatedFeedsToMe = new ArrayCollection();
     }
 
+    public function getCleanDescription($maxLength = 200){
+        $description = strlen($this->description) > $maxLength ? substr($this->description, 0, $maxLength) . ".." : $this->description;
+        return htmlentities($description);
+    }
+
+    public function getKeywords(){
+        $keywords = array('league','of','legends','video','feed');
+        $title = explode(" ",htmlentities($this->title));
+        if(count($title) > 5){
+            $title = array_slice($title,0,7);
+        }
+        return join(',',array_merge($keywords,$title));
+    }
+
     /**
      * Returns an array with the feed's og tags.
      *
@@ -143,9 +157,10 @@ class Feed {
     public function getOgTags(){
         $ogTags = array();
         $ogTags["title"] = $this->title;
-        $ogTags["description"] = "Watch the best League of Legends videos on Leetfeed.";
+        $ogTags["description"] = $this->getCleanDescription(200);
         $ogTags["image"] = $this->getThumbnail("medium");
         $ogTags["url"] = "http://www.leetfeed.com/feed/" . $this->feedId;
+        $ogTags["type"] = "video.movie";
         $ogTags["video"] = "http://www.youtube.com/v/" . $this->videoId . '?version=3&amp;autohide=1';
         return $ogTags;
     }

@@ -3,45 +3,46 @@ $children = $this->viewModel()->getCurrent()->getChildren();
 $child = $children[0];
 $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "Leetfeed - The Best League Of Legends Videos.";
 ?>
-<html lang="en">
+<html lang="en" xmlns:og="http://ogp.me/ns#">
 <head>
     <?php echo $this->headTitle($pageTitle); ?>
 
     <?php
+    // meta tags
+    $description = isset($child->metaInfo['description']) ? $child->metaInfo['description'] : 'Leetfeed has the best League of Legends videos on the internet and can help you improve by providing Pro gameplays based on the latest champions you played.';
+    $keywords = isset($child->metaInfo['keywords']) ? $child->metaInfo['keywords'] : 'league, of, legends, best, videos, gameplay, pro, players, leetfeed, youtube';
+    // og tags
+    $ogTitle = isset($child->ogTags["title"]) ? $child->ogTags["title"] : "Leetfeed - The Best League of Legends videos.";
+    $ogUrl = isset($child->ogTags["url"]) ? $child->ogTags["url"] : "http://www.leetfeed.com";
+    $ogImage = isset($child->ogTags["image"]) ? $child->ogTags["image"] : "http://i.imgur.com/IMuF0ng.jpg";
+    $ogDescription = isset($child->ogTags["description"]) ? $child->ogTags["description"] : $description;
+    $ogType = isset($child->ogTags["type"]) ? $child->ogTags["type"] : "website";
+
     $this->headMeta()
         ->setCharset('UTF-8')
         ->appendName('viewport', 'width=device-width, initial-scale=1.0')
         ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
-        ->appendName('description', 'Leetfeed is a league of legends random video generator site.')
-        ->appendName('keywords', 'league, of, legends, random, video, generator, leetfeed, youtube')
+        ->appendName('description', $description)
+        ->appendName('keywords', $keywords)
         ->appendName('robots', 'feed, follow')
         ->appendName('language', 'en')
         ->appendName('googlebot', 'feed, follow, archive')
-        ->appendProperty("og:site_name", "Leetfeed");
-    if (isset($child->ogTags)) {
-        $ogTitle = $child->ogTags["title"];
-        $ogUrl = $child->ogTags["url"];
-        $ogImage = $child->ogTags["image"];
-        $ogDescription = $child->ogTags["description"];
+        ->appendProperty('fb:app_id', '268335233334900')
+        ->appendProperty('fb:admins', '1124061431')
+        ->appendProperty("og:site_name", "Leetfeed")
+        ->appendProperty('og:title', $ogTitle)
+        ->appendProperty('og:type', $ogType)
+        ->appendProperty('og:url', $ogUrl)
+        ->appendProperty('og:description', $ogDescription)
+        ->appendProperty('og:image', $ogImage);
+
+    if ($child->ogTags["video"]) {
         $this->headMeta()
             ->appendProperty('og:video', $child->ogTags["video"])
             ->appendProperty('og:video:type', "application/x-shockwave-flash")
             ->appendProperty('og:video:width', "965")
             ->appendProperty('og:video:height', "576");
-    } else {
-        $ogTitle = "Leetfeed - Best Video Generator";
-        $ogUrl = "http://www.leetfeed.com";
-        $ogImage = 'http://i.imgur.com/IMuF0ng.jpg';
-        $ogDescription = "Leetfeed is a league of legends video generator.";
     }
-    $this->headMeta()->appendProperty('og:title', $ogTitle)
-        ->appendProperty('og:type', "website")
-        ->appendProperty('og:url', $ogUrl)
-        ->appendProperty('og:description', $ogDescription)
-        ->appendProperty('og:image', $ogImage)
-        ->appendProperty('fb:app_id', '268335233334900')
-        ->appendProperty('fb:admins', '1124061431');
-
     echo $this->headMeta();
     ?>
 

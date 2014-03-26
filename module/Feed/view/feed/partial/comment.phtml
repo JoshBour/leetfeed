@@ -5,12 +5,19 @@
 $comment = $this->comment;
 if ($comment):
     ?>
-    <div class="comment-<?php echo $comment->getCommentId(); ?>">
-        <div class="commentAccount"><span class="author"><?php echo $comment->getAccount()->getUsername(); ?></span> :
+    <li itemtype="http://schema.org/Comment" itemscope="itemscope">
+        <div class="comment-<?php echo $comment->getCommentId(); ?>">
+            <div class="commentAccount"><span class="author"
+                                              itemprop="author"><?php echo $comment->getAccount()->getUsername(); ?></span>
+                :
+            </div>
+            <div class="commentBody" itemprop="text"><?php echo $this->escapeHtml($comment->getContent()); ?></div>
+            <div class="commentTime">
+                <time itemprop="dateCreated"
+                      datetime="<?php echo $comment->getPostTime(); ?>"><?php echo (isset($isRecent) && $isRecent) ? "moments" : $comment->getTimeAgo(); ?>
+                    ago
+                </time>
+            </div>
         </div>
-        <div class="commentBody"><?php echo $this->escapeHtml($comment->getContent()); ?></div>
-        <div class="commentTime"><?php echo (isset($isRecent) && $isRecent) ? "moments" : $comment->getTimeAgo(); ?>
-            ago
-        </div>
-    </div>
+    </li>
 <?php endif; ?>

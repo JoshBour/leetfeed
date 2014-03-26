@@ -100,6 +100,7 @@ class FeedController extends AbstractActionController
                     "feeds" => $feeds,
                     "summoners" => $summoners,
                     "activeSummonerName" => $summoner->getName(),
+                    "pageTitle" => "Improve your League of Legends play skills"
                 ));
             } else {
                 return $this->notFoundAction();
@@ -116,7 +117,8 @@ class FeedController extends AbstractActionController
     public function randomAction()
     {
         return new ViewModel(array(
-            "includeProgressBar" => true
+            "includeProgressBar" => true,
+            "pageTitle" => "Find a random League of Legends feed!"
         ));
     }
 
@@ -197,7 +199,9 @@ class FeedController extends AbstractActionController
             "youtubers" => $youtubers,
             "feeds" => $feeds["feeds"],
             "nextToken" => $feeds["nextToken"],
-            "randomYoutuber" => $randomYoutuber));
+            "randomYoutuber" => $randomYoutuber,
+            "pageTitle" => "Feeds from the League of Legends pros and famous youtubers"
+        ));
     }
 
     /**
@@ -246,7 +250,10 @@ class FeedController extends AbstractActionController
             return $this->notFoundAction();
         }
         $account = $this->account();
-        return new ViewModel(array("feeds" => $account->getLikedFeeds()));
+        return new ViewModel(array(
+            "feeds" => $account->getLikedFeeds(),
+            "pageTitle" => "Leeted feeds"
+        ));
     }
 
     /**
@@ -263,7 +270,11 @@ class FeedController extends AbstractActionController
         $sort = $this->params()->fromRoute("sort");
         $account = $this->account();
         $feeds = $this->getFeedRepository()->findFeedsByDate($account, $sort);
-        return new ViewModel(array("feeds" => $feeds, "sort" => $sort));
+        return new ViewModel(array(
+            "feeds" => $feeds,
+            "sort" => $sort,
+            "pageTitle" => "The feeds you have watched"
+        ));
     }
 
     /**
@@ -296,11 +307,16 @@ class FeedController extends AbstractActionController
                 }
                 if ($this->identity()) $this->getFeedService()->addFeedToWatched($feedId);
                 $related = $this->getGenerator()->getRelatedFeeds($feed);
+                $metaInfo = array();
+                $metaInfo["keywords"] = $feed->getKeywords();
+                $metaInfo['description'] = $feed->getCleanDescription();
                 return new ViewModel(array(
                     "feed" => $feed,
                     'ogTags' => $feed->getOgTags(),
                     "pageTitle" => $feed->getTitle(),
-                    "relatedFeeds" => $related));
+                    "relatedFeeds" => $related,
+                    "metaInfo" => $metaInfo
+                ));
             } else {
                 return $this->redirect()->toRoute(self::ROUTE_RANDOM);
             }

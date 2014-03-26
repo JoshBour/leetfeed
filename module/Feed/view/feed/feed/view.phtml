@@ -9,7 +9,11 @@ $comments = $feed->getComments();
 $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '..' : $feed->getTitle();
 ?>
 <div id="main">
-    <div id="feed" class="feed-<?php echo $feedId; ?>">
+    <div id="feed" class="feed-<?php echo $feedId; ?>" itemscope="video" itemtype="http://schema.org/VideoObject">
+        <span itemprop="name" class="inactive"><?php echo $title; ?></span>
+        <span class="inactive" itemprop="description"><?php echo $feed->getCleanDescription(); ?></span>
+        <meta itemprop="thumbnailURL" content="<?php echo $feed->getThumbnail("high"); ?>" />
+        <meta itemprop="embedURL" content="https://youtube.googleapis.com/v/<?php echo $id; ?>" />
         <iframe width="965" height="576" src="http://www.youtube.com/embed/<?php echo $id; ?>?enablejsapi=1&autoplay=1"
                 frameborder="0"
                 allowfullscreen></iframe>
@@ -61,9 +65,9 @@ $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '.
         <div class="moduleBody">
             <?php if ($comments->count() > 0): ?>
 
-                <ul id="commentList">
+                <ul id="commentList"  itemscope itemtype="http://schema.org/UserComments">
                     <?php foreach ($comments as $comment): ?>
-                        <li><?php echo $this->partial("comment", array('comment' => $comment)); ?></li>
+                        <?php echo $this->partial("comment", array('comment' => $comment)); ?>
                     <?php endforeach; ?>
                 </ul>
             <?php else: ?>
