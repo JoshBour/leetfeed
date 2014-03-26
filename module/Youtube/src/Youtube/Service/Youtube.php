@@ -43,6 +43,7 @@ class Youtube implements ServiceManagerAwareInterface
         }else if($time == "this_year"){
             $datetime = new \DateTime("-1 week");
         }
+        if($maxResults>50)$maxResults = 5;
         $time = $datetime->format(\DateTime::RFC3339);
         $options = array(
             "type" => "video",

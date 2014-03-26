@@ -26,6 +26,26 @@ return array(
                     ),
                 ),
             ),
+            'sitemap_direct' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/sitemap.xml',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action'     => 'sitemap',
+                    ),
+                ),
+            ),
+            'sitemap' => array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route'    => '/sitemap[/:type[/:index]]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action'     => 'sitemap',
+                    ),
+                ),
+            ),
             'promote' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(

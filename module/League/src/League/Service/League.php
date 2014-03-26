@@ -85,7 +85,8 @@ class League implements ServiceManagerAwareInterface
     {
         if (!in_array($region, self::$supportedRegions)) throw new \Exception(self::ERROR_NOT_SUPPORTED_REGION);
         //sanitize name a bit - this will break weird characters
-        $name = preg_replace("/[^a-zA-Z0-9 ]+/", "", $name);
+      #  $name = preg_replace("/[^a-zA-Z0-9 ]+/", "", $name);
+        $name = str_replace(' ','',$name);
         $call = 'summoner/by-name/' . $name;
 
         //add API URL to the call

@@ -12,5 +12,18 @@
  */
 
 return array(
-    // ...
+    'static_pages' => array(
+        '/login',
+        '/logout',
+        '/register',
+        '/',
+        '/faq',
+        '/promote',
+        '/contact',
+        '/history',
+        '/random',
+        '/famous',
+        '/leet',
+        '/improve'
+    )
 );

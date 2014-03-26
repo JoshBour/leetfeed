@@ -50,6 +50,51 @@ class IndexController extends AbstractActionController
      */
     private $premiumFeedRepository;
 
+    public function sitemapAction()
+    {
+        $this->getResponse()->getHeaders()->addHeaders(array('Content-type' => 'application/xml; charset=utf-8'));
+        $type = $this->params()->fromRoute('type');
+        $sitemapXmlParser = new \Application\Model\SitemapXmlParser();
+        $sitemapXmlParser->begin();
+        if (!$type) {
+            $feedCount = $this->getFeedRepository()->countFeeds();
+            $pageCount = $feedCount > 30000 ? intval($feedCount / 30000) : 1;
+            $sitemapXmlParser->addHeader("sitemapindex");
+            $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/static");
+            for ($i = 0; $i < $pageCount; $i++)
+                $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/dynamic/" . $i * 30000 . "-" . ($i + 1) * 30000);
+
+        }else{
+            $pages = array();
+            if($type == "static"){
+                $pages = $this->getServiceLocator()->get('Config')['static_pages'];
+            }else{
+                $index = $this->params()->fromRoute("index");
+                $limits = explode("-",$index);
+                $feeds = $this->getFeedRepository()->findBy(array(),array(),55,$limits[0]);
+                foreach($feeds as $feed){
+                    $pages[] = "/feed/".$feed->getFeedId();
+                }
+            }
+            $sitemapXmlParser->addHeader("urlset");
+            $i = 0;
+            foreach($pages as $page){
+                if($i == 20){
+                    $sitemapXmlParser->show();
+                    $i = 0;
+                }
+                $sitemapXmlParser->addUrl("http://www.leetfeed.com" . $page);
+                $i++;
+            }
+        }
+        $view = new ViewModel();
+        $view->setTerminal(true);
+        $view->setTemplate('application/index/sitemap.xml');
+        $sitemapXmlParser->close();
+        $sitemapXmlParser->show();
+        return $view;
+    }
+
     /**
      * The index action.
      * Route: \
@@ -65,10 +110,10 @@ class IndexController extends AbstractActionController
         $latestFeeds = $accountsHistoryRepository->findBy(array(), array("watchTime" => "DESC"), 50);
 
         $feedCnt = $feedRepository->countFeeds("0");
-        $feedTotalPages = intval(floor($feedCnt/50));
+        $feedTotalPages = intval(floor($feedCnt / 50));
 
         $latestFeedCnt = $accountsHistoryRepository->countFeeds();
-        $latestFeedsTotalPages = intval($latestFeedCnt/50);
+        $latestFeedsTotalPages = intval($latestFeedCnt / 50);
 
         $premiumFeeds = new Paginator(new ArrayAdapter($premiumFeeds));
         $premiumFeeds->setCurrentPageNumber(1);
@@ -98,14 +143,14 @@ class IndexController extends AbstractActionController
             $isPremium = false;
             switch ($category) {
                 case "top-feeds":
-                    $feeds = $this->getFeedRepository()->findBy(array("isRelated" => 0), array("rating" => "DESC"),50, 50 * $page);
+                    $feeds = $this->getFeedRepository()->findBy(array("isRelated" => 0), array("rating" => "DESC"), 50, 50 * $page);
                     break;
                 case "premium-feeds":
-                    $feeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"),50, 50 * $page);
+                    $feeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"), 50, 50 * $page);
                     $isPremium = true;
                     break;
                 case "latest-feeds":
-                    $feeds = $this->getAccountsHistoryRepository()->findBy(array(), array("watchTime" => "DESC"),50, 50 * $page);
+                    $feeds = $this->getAccountsHistoryRepository()->findBy(array(), array("watchTime" => "DESC"), 50, 50 * $page);
                     $isPremium = true;
                     break;
                 default:

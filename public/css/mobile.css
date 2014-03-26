@@ -66,6 +66,19 @@
     padding:8px;
 }
 
+#announcement{
+    width:100%;
+    padding:10px 0;
+    overflow: visible;
+}
+
+#announcement .remove{
+    position: absolute;
+    font-size: 20px;
+    right: 0;
+    top: -10px;
+}
+
 header nav ul li{
     padding-top: 8px;
     height: 32px;
