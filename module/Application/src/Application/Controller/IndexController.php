@@ -58,11 +58,14 @@ class IndexController extends AbstractActionController
         $sitemapXmlParser->begin();
         if (!$type) {
             $feedCount = $this->getFeedRepository()->countFeeds();
-            $pageCount = $feedCount > 30000 ? intval($feedCount / 30000) : 1;
+            $pageCount = $feedCount > 15000 ? $feedCount / 15000 : 1;
+            if(!is_int($pageCount)){
+                $pageCount = intval($pageCount)+1;
+            }
             $sitemapXmlParser->addHeader("sitemapindex");
             $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/static");
             for ($i = 0; $i < $pageCount; $i++)
-                $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/dynamic/" . $i * 30000 . "-" . ($i + 1) * 30000);
+                $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/dynamic/" . $i * 15000 . "-" . ($i + 1) * 15000);
 
         }else{
             $pages = array();
@@ -71,7 +74,7 @@ class IndexController extends AbstractActionController
             }else{
                 $index = $this->params()->fromRoute("index");
                 $limits = explode("-",$index);
-                $feeds = $this->getFeedRepository()->findBy(array(),array(),55,$limits[0]);
+                $feeds = $this->getFeedRepository()->findBy(array(),array(),15000,$limits[0]);
                 foreach($feeds as $feed){
                     $pages[] = "/feed/".$feed->getFeedId();
                 }
