@@ -164,8 +164,14 @@ if (!empty($messages)) :
     </div>
 </header>
 <div id="content">
-    <?php if (!isset($_COOKIE['shownAnnouncement'])): ?>
-        <div id="announcement" class="module">
+    <?php if (!isset($_COOKIE['firstTime'])): ?>
+        <div id="announcement" class="module" data-scope="firstTime">
+            <p>Welcome to Leetfeed, summoner! Make sure to watch the <a href="https://www.youtube.com/watch?v=_GXLY2YJask" target="_blank">tutorial video</a> and get started!</p>
+
+            <div class="remove">X</div>
+        </div>
+    <?php elseif (!isset($_COOKIE['facebookModerator'])): ?>
+        <div id="announcement" class="module" data-scope="facebookModerator">
             <p>Are you going to be our new facebook page moderator? Feel free to apply at our <a
                     href="<?php echo $this->url('contact'); ?>">contact page</a> using the subject title "Facebook
                 Application"!</p>

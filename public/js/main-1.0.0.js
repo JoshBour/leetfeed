@@ -57,8 +57,10 @@ $(function () {
     });
 
     $('#announcement .remove').on('click', function (e) {
-        $(this).parent().detach();
-        createCookie("shownAnnouncement", "true", 5);
+        var elem = $(this).parent();
+        var scope = elem.attr('data-scope');
+        elem.detach();
+        createCookie(scope, "true", 5);
     });
 
     $(".moduleSort select").on("change", function (e) {
