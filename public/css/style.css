@@ -372,6 +372,11 @@
         overflow:hidden;
     }
 
+    .verticalFeedList .feedDelete{
+        float: right;
+        padding: 10px 10px;
+    }
+
     .verticalFeedList  .feedDescription{
         overflow: auto;
         position:relative;

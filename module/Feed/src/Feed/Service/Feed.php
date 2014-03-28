@@ -163,7 +163,7 @@ class Feed implements ServiceManagerAwareInterface
      * @param bool $flush
      * @return \Feed\Entity\Feed
      */
-    public function createFromEntry($video, $related = 0, $flush = true)
+    public function createFromEntry($video, $related = 1, $flush = true)
     {
         $game = $this->getGameRepository()->find(1);
         $feedRepository = $this->getFeedRepository();

@@ -66,7 +66,7 @@ class FeedGenerator implements ServiceManagerAwareInterface
                         $video->getId(),
                         $video->getTitle(),
                         $video->getChannel()->getTitle(),
-                        $video->getDescription(), 1, 0);
+                        $video->getDescription());
                     $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($newFeed);
                     if (!$isPersisted) $em->persist($newFeed);
                     $flush = true;
@@ -130,7 +130,7 @@ class FeedGenerator implements ServiceManagerAwareInterface
 
     private function getRandomFeedList()
     {
-        if (rand(1, 10) < 5) {
+        if (rand(1, 8) < 5) {
             $youtubers = $this->getYoutuberRepository()->findAll();
             $youtuber = $youtubers[rand(0, count($youtubers) - 1)];
             $feeds = $this->getYoutubeService()->findChannelByUsername($youtuber->getName())->getUploads();

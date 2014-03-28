@@ -277,6 +277,20 @@ class FeedController extends AbstractActionController
         ));
     }
 
+    public function deleteAction(){
+        $feedId = $this->params()->fromRoute("feedId", null);
+        if ($feedId) {
+            /**
+             * @var $feed \Feed\Entity\Feed
+             */
+            $feed = $this->getFeedRepository()->find($feedId);
+            $em = $this->getEntityManager();
+            $em->remove($feed);
+            $em->flush();
+            return $this->redirect()->toRoute('home');
+        }
+    }
+
     /**
      * The view action.
      * Route: /feed/:feedId

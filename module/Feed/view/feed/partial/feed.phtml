@@ -2,9 +2,12 @@
 if ($isPremium) {
     $feed = $this->feed->getFeed();
 }
+if($feed){
 $feedId = $feed->getFeedId();
 $title = $this->escapeHtml(substr($feed->getTitle(), 0, 80));
 $description = $feed->getCleanDescription(100);
+$username = $this->identity();
+$isAdmin = $this->identity() && $this->identity()->getUsername() == "Admin";
 ?>
 <li class="feed-<?php echo $feedId; ?>" data-video-id="<?php echo $feed->getVideoId(); ?>">
     <div class="feedThumbnail">
@@ -27,9 +30,15 @@ $description = $feed->getCleanDescription(100);
                    href="https://twitter.com/intent/tweet?hashtags=leetfeed&original_referer=http://www.leetfeed.com&text=<?php echo $title . " leetfeed.com/feed/{$feedId}"; ?>&tw_p=tweetbutton&url=%2Ffeed%2F1268&via=leetfeed">Share</a>
             </div>
         </div>
+        <?php if($isAdmin): ?>
+        <div class="feedDelete">
+            <a href="<?php echo $this->url('feed/delete',array('feedId' => $feedId)); ?>">Delete</a>
+        </div>
+        <?php endif; ?>
         <div class="feedDescription">
             <?php echo nl2br($this->escapeHtml($description)); ?>
         </div>
 
     </div>
 </li>
+<?php } ?>

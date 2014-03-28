@@ -114,7 +114,7 @@ class Feed {
      * @param int $rising
      * @return Feed
      */
-    public static function create($game,$videoId,$title,$author,$description,$related = 0,$rising=0){
+    public static function create($game,$videoId,$title,$author,$description,$related = 1,$rising=0){
         $feed = new Feed();
         $feed->setGame($game);
         $feed->setVideoId($videoId);

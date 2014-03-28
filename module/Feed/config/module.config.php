@@ -111,6 +111,18 @@ return array(
                             ),
                         ),
                     ),
+                    'delete' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/delete/:feedId',
+                            'defaults' => array(
+                                'action' => 'delete',
+                            ),
+                            'constraints' => array(
+                                'feedId' => '[0-9]+',
+                            ),
+                        ),
+                    ),
                     'rate' => array(
                         'type' => 'Zend\Mvc\Router\Http\Segment',
                         'options' => array(

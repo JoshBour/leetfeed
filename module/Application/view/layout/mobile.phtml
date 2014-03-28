@@ -3,51 +3,52 @@ $children = $this->viewModel()->getCurrent()->getChildren();
 $child = $children[0];
 $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "Leetfeed - The Best League Of Legends Videos.";
 ?>
-<html lang="en">
+<html lang="en" xmlns:og="http://ogp.me/ns#">
 <head>
     <?php echo $this->headTitle($pageTitle); ?>
 
     <?php
+    // meta tags
+    $description = isset($child->metaInfo['description']) ? $child->metaInfo['description'] : 'Leetfeed has the best League of Legends videos on the internet and can help you improve by providing Pro gameplays based on the latest champions you played.';
+    $keywords = isset($child->metaInfo['keywords']) ? $child->metaInfo['keywords'] : 'league, of, legends, best, videos, gameplay, pro, players, leetfeed, youtube';
+    // og tags
+    $ogTitle = isset($child->ogTags["title"]) ? $child->ogTags["title"] : "Leetfeed - The Best League of Legends videos.";
+    $ogUrl = isset($child->ogTags["url"]) ? $child->ogTags["url"] : "http://www.leetfeed.com";
+    $ogImage = isset($child->ogTags["image"]) ? $child->ogTags["image"] : "http://i.imgur.com/IMuF0ng.jpg";
+    $ogDescription = isset($child->ogTags["description"]) ? $child->ogTags["description"] : $description;
+    $ogType = isset($child->ogTags["type"]) ? $child->ogTags["type"] : "website";
+
     $this->headMeta()
         ->setCharset('UTF-8')
         ->appendName('viewport', 'width=device-width, initial-scale=1.0')
         ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
-        ->appendName('description', 'Leetfeed is a league of legends random video generator site.')
-        ->appendName('keywords', 'league, of, legends, random, video, generator, leetfeed, youtube')
+        ->appendName('description', $description)
+        ->appendName('keywords', $keywords)
         ->appendName('robots', 'feed, follow')
         ->appendName('language', 'en')
         ->appendName('googlebot', 'feed, follow, archive')
-        ->appendProperty("og:site_name", "Leetfeed");
-    if (isset($child->ogTags)) {
-        $ogTitle = $child->ogTags["title"];
-        $ogUrl = $child->ogTags["url"];
-        $ogImage = $child->ogTags["image"];
-        $ogDescription = $child->ogTags["description"];
+        ->appendProperty('fb:app_id', '268335233334900')
+        ->appendProperty('fb:admins', '1124061431')
+        ->appendProperty("og:site_name", "Leetfeed")
+        ->appendProperty('og:title', $ogTitle)
+        ->appendProperty('og:type', $ogType)
+        ->appendProperty('og:url', $ogUrl)
+        ->appendProperty('og:description', $ogDescription)
+        ->appendProperty('og:image', $ogImage);
+
+    if ($child->ogTags["video"]) {
         $this->headMeta()
             ->appendProperty('og:video', $child->ogTags["video"])
             ->appendProperty('og:video:type', "application/x-shockwave-flash")
             ->appendProperty('og:video:width', "965")
             ->appendProperty('og:video:height', "576");
-    } else {
-        $ogTitle = "Leetfeed - Best Video Generator";
-        $ogUrl = "http://www.leetfeed.com";
-        $ogImage = 'http://i.imgur.com/IMuF0ng.jpg';
-        $ogDescription = "Leetfeed is a league of legends video generator.";
     }
-    $this->headMeta()->appendProperty('og:title', $ogTitle)
-        ->appendProperty('og:type', "website")
-        ->appendProperty('og:url', $ogUrl)
-        ->appendProperty('og:description', $ogDescription)
-        ->appendProperty('og:image', $ogImage)
-        ->appendProperty('fb:app_id', '268335233334900')
-        ->appendProperty('fb:admins', '1124061431');
-
     echo $this->headMeta();
     ?>
 
     <!-- Styles -->
     <?php $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath('images/favicon.ico')))
-        ->prependStylesheet($this->basePath('css/style.css'));
+        ->prependStylesheet($this->basePath('css/style.min.css'));
     if (isset($child->includeProgressBar)) {
         $this->headLink()->prependStylesheet($this->basePath('css/ui.progress-bar.min.css'));
     }
@@ -57,13 +58,7 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
 
     <!-- Scripts -->
     <?php
-    $this->headScript()
-        ->prependFile($this->basePath('js/lib.js'))
-        ->prependFile($this->basePath('js/jquery.mousewheel.min.js'))
-        ->prependFile($this->basePath('js/perfect-scrollbar.min.js'))
-        ->prependFile($this->basePath('js/respond.min.js'), 'text/javascript', array('conditional' => 'lt IE 9',))
-        ->prependFile($this->basePath('js/html5shiv.js'), 'text/javascript', array('conditional' => 'lt IE 9',))
-        ->prependFile($this->basePath('js/jquery.min.js'));
+    $this->headScript();
     if (isset($child->includeProgressBar)) {
         $this->headScript()->appendFile($this->basePath('js/progress.min.js'));
     }
@@ -76,7 +71,7 @@ $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "L
         var baseUrl = '<?php echo $this->basePath(); ?>';
         var isMobile = true;
     </script>
-    <script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
+    <script type="text/javascript" async="async" src="http://www.google-analytics.com/ga.js"></script>
     <script>
         (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -166,8 +161,14 @@ if (!empty($messages)) :
     </div>
 </header>
 <div id="content">
-    <?php if (!isset($_COOKIE['shownAnnouncement'])): ?>
-        <div id="announcement" class="module">
+    <?php if (!isset($_COOKIE['firstTime'])): ?>
+        <div id="announcement" class="module" data-scope="firstTime">
+            <p>Welcome to Leetfeed, summoner! Make sure to watch the <a href="https://www.youtube.com/watch?v=_GXLY2YJask" target="_blank">tutorial video</a> and get started!</p>
+
+            <div class="remove">X</div>
+        </div>
+    <?php elseif (!isset($_COOKIE['facebookModerator'])): ?>
+        <div id="announcement" class="module" data-scope="facebookModerator">
             <p>Are you going to be our new facebook page moderator? Feel free to apply at our <a
                     href="<?php echo $this->url('contact'); ?>">contact page</a> using the subject title "Facebook
                 Application"!</p>
@@ -176,9 +177,24 @@ if (!empty($messages)) :
         </div>
     <?php endif; ?>
     <?php echo $this->content; ?>
+    <div id="advertisement" class="module">
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- Leetfeed Mobile -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:320px;height:100px"
+             data-ad-client="ca-pub-6737088231270252"
+             data-ad-slot="1617814616"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
 </div>
 <footer>
     <p>&copy; Leetfeed <?php echo date('Y') ?>
+        <a href="http://www.facebook.com/leetfeed" target="_blank"><img
+                src="<?php echo $this->basePath('images/fb-icon-24x24.png'); ?>"/></a>
+        <a href="http://www.twitter.com/leetfeed" target="_blank"><img
+                src="<?php echo $this->basePath('images/twitter-icon-24x24.png'); ?>"/></a></p>
     <nav>
         <ul>
             <li><a href="<?php echo $this->url("faq"); ?>">FAQ</a></li>
@@ -187,7 +203,13 @@ if (!empty($messages)) :
         </ul>
     </nav>
 </footer>
-<?php echo $this->inlineScript()->prependFile($this->basePath('js/main-1.0.0.js'), 'text/javascript'); ?>
+<?php echo $this->inlineScript()->prependFile($this->basePath('js/main-1.0.0.min.js'), 'text/javascript')
+    ->prependFile($this->basePath('js/lib.min.js'))
+    ->prependFile($this->basePath('js/jquery.mousewheel.min.js', 'text/javascript'))
+    ->prependFile($this->basePath('js/perfect-scrollbar.min.js', 'text/javascript'))
+    ->prependFile($this->basePath('js/respond.min.js', 'text/javascript', array('conditional' => 'lt IE 9')))
+    ->prependFile($this->basePath('js/html5shiv.js', 'text/javascript', array('conditional' => 'lt IE 9')))
+    ->prependFile($this->basePath('js/jquery.min.js', 'text/javascript')); ?>
 <div id="fb-root"></div>
 <script>(function (d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];

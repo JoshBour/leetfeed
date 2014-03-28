@@ -1,36 +1,36 @@
-#content{
+#content {
     overflow: inherit;
 }
 
-#main,footer,.module,#login,#register,header #topWrapper,#contactForm, #loginForm, #registerForm{
-    width:auto;
+#main, footer, .module, #login, #register, header #topWrapper, #contactForm, #loginForm, #registerForm {
+    width: auto;
 }
 
-#main{
-    margin-top:20px;
+#main {
+    margin-top: 20px;
 }
 
-.module, #register, #login{
-    margin:20px;
+.module, #register, #login {
+    margin: 20px;
 }
 
-#topWrapper{
-    position:relative;
+#topWrapper {
+    position: relative;
 }
 
-#topWrapper nav ul{
-    border:1px solid #333;
+#topWrapper nav ul {
+    border: 1px solid #333;
 }
 
-#topWrapper nav{
-    display:none;
+#topWrapper nav {
+    display: none;
     position: absolute;
     right: 0;
     top: 41px;
     z-index: 999;
 }
 
-#mobileMenuToggle{
+#mobileMenuToggle {
     display: block;
     width: 24px;
     height: 24px;
@@ -40,46 +40,46 @@
     float: right;
 }
 
-.module h1{
-    font-size:14px;
+.module h1 {
+    font-size: 14px;
 }
 
-.module .hideToggle{
-    font-size:16px;
+.module .hideToggle {
+    font-size: 16px;
 }
 
-.module .verticalFeedList .feedBody, .module .verticalFeedList .feedThumbnail{
-    width:50%;
-    float:left;
+.module .verticalFeedList .feedBody, .module .verticalFeedList .feedThumbnail {
+    width: 50%;
+    float: left;
 }
 
-.verticalFeedList .feedThumbnail{
-    margin-right:0;
+.verticalFeedList .feedThumbnail {
+    margin-right: 0;
 }
 
-.module .verticalFeedList .feedThumbnail img{
+.module .verticalFeedList .feedThumbnail img {
     width: 95%;
-    height:auto;
+    height: auto;
 }
 
-.moduleSort select{
-    padding:8px;
+.moduleSort select {
+    padding: 8px;
 }
 
-#announcement{
-    width:100%;
-    padding:10px 0;
+#announcement {
+    width: 100%;
+    padding: 10px 0;
     overflow: visible;
 }
 
-#announcement .remove{
+#announcement .remove {
     position: absolute;
     font-size: 20px;
     right: 0;
     top: -10px;
 }
 
-header nav ul li{
+header nav ul li {
     padding-top: 8px;
     height: 32px;
     width: 115px;
@@ -89,56 +89,56 @@ header nav ul li{
     border-bottom: 1px solid #222;
 }
 
-header nav ul li:last-of-type{
-    border-bottom:none;
+header nav ul li:last-of-type {
+    border-bottom: none;
 }
 
-nav ul li a{
-    padding:5px;
-}
-
-nav ul #userNav{
-    padding-left:0;
-    border-bottom: 1px solid #777;
-}
-
-.verticalFeedList .feedTitle, .verticalFeedList .feedShare{
-    float:none;
-    display:block;
-}
-
-.verticalFeedList .feedShare{
-    margin:7px 0;
-}
-
-.fb-share, .twitter-share{
-    width: 20px;
-}
-
-.verticalFeedList .feedHeader{
+nav ul li a {
     padding: 5px;
 }
 
-#info .moduleBody{
+nav ul #userNav {
+    padding-left: 0;
+    border-bottom: 1px solid #777;
+}
+
+.verticalFeedList .feedTitle, .verticalFeedList .feedShare {
+    float: none;
+    display: block;
+}
+
+.verticalFeedList .feedShare {
+    margin: 7px 0;
+}
+
+.fb-share, .twitter-share {
+    width: 20px;
+}
+
+.verticalFeedList .feedHeader {
+    padding: 5px;
+}
+
+#info .moduleBody {
     overflow: auto;
 }
 
-#feed iframe{
-    width:100%;
-    height:auto;
-    margin:0 auto;
-    padding:0;
+#feed iframe {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    padding: 0;
 }
 
-#logo{
-    margin-left:5px;
+#logo {
+    margin-left: 5px;
 }
 
-.commentWrapper{
+.commentWrapper {
     text-align: center;
 }
 
-input#addComment{
+input#addComment {
     width: 100%;
     padding: 10px 0;
     text-indent: 5px;
@@ -151,12 +151,16 @@ input#addComment{
     text-indent: 5px;
 }
 
-
-#progress_bar{
-    width:auto;
+#progress_bar {
+    width: auto;
     margin: 30px auto;
 }
 
-footer p{
+footer p {
     margin-Left: 5px;
+}
+
+#advertisement {
+    width: auto;
+    height: auto;
 }
