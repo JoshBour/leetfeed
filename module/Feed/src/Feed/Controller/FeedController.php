@@ -328,11 +328,11 @@ class FeedController extends AbstractActionController
                         return $this->redirect()->toRoute(self::ROUTE_HOME);
                     }
                 }
-                return new ViewModel(array(
-                    "form" => $form,
-                    "noAds" => true
-                ));
             }
+            return new ViewModel(array(
+                "form" => $form,
+                "noAds" => true
+            ));
         }
         return $this->notFoundAction();
 

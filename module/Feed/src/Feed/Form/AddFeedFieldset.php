@@ -69,16 +69,6 @@ class AddFeedFieldset extends Fieldset implements InputFilterProviderInterface
                             )
                         )
                     ),
-                    array(
-                        'name' => 'StringLength',
-                        'options' => array(
-                            'min' => 4,
-                            'max' => 15,
-                            'messages' => array(
-                                \Zend\Validator\StringLength::INVALID => $this->translator->translate(self::ERROR_TITLE_INVALID_LENGTH)
-                            )
-                        )
-                    ),
                 ),
                 'filters' => array(
                     array('name' => 'StringTrim'),

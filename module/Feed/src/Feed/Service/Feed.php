@@ -179,20 +179,20 @@ class Feed implements ServiceManagerAwareInterface
      * @param int $related
      * @param bool $flush
      * @param bool $persist
-     * @param EntityManager $em
      * @return \Feed\Entity\Feed
      */
-    public function createFromEntry($video, $related = 1, $flush = true, $persist = true, &$em = null)
+    public function createFromEntry($video, $related = 1, $flush = true, $persist = true)
     {
         $game = $this->getGameRepository()->find(1);
         $feedRepository = $this->getFeedRepository();
         if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
-            $feed = \Feed\Entity\Feed::create($game, $video->getId(), $video->getTitle(), $video->getChannel()->getTitle(), $video->getDescription(), $related);
-            $em = $em ? $em : $this->getEntityManager();
-            $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
-            if (!$isPersisted && $persist) $em->persist($feed);
-            if ($flush) $em->flush();
-
+         #   $feed = \Feed\Entity\Feed::create($game, $video->getId(), $video->getTitle(), $video->getChannel()->getTitle(), $video->getDescription(), $related);
+            if ($flush || $persist) {
+                $em = $this->getEntityManager();
+                $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
+                if (!$isPersisted && $persist) $em->persist($feed);
+                if ($flush) $em->flush();
+            }
         }
         return $feed;
     }
