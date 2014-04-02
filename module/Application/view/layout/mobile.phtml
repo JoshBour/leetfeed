@@ -115,49 +115,7 @@ if (!empty($messages)) :
             <a href="<?php echo $this->url('home'); ?>"
                title="<?php echo $this->translate("Leetfeed"); ?>">Logo</a>
         </div>
-        <img id="mobileMenuToggle" src="<?php echo $this->basePath("images/menu-button.png"); ?>" />
-        <nav>
-            <ul>
-                <li>
-                    <a href="<?php echo $this->url("random"); ?>" title="Find a random feed">Random</a>
-                </li>
-                <li>
-                    <a href="<?php echo $this->url("famous"); ?>" title="Feeds by famous people">Famous</a>
-                </li>
-                <?php if (!$this->identity()): ?>
-                    <li>
-                        <a href="<?php echo $this->url("login"); ?>" title="Login to Leetfeed">Login</a>
-                    </li>
-                    <li>
-                        <a href="<?php echo $this->url("register"); ?>" title="Register to Leetfeed">Register</a>
-                    </li>
-                <?php else: ?>
-                    <li>
-                        <a href="<?php echo $this->url("improve"); ?>" title="Feeds to improve your skills!">Improve</a>
-                    </li>
-                    <li id="userNav">
-                        <a href="#"
-                           title="<?php echo $this->translate("My Profile"); ?>" id="navToggle">
 
-                            <?php echo ucfirst($this->identity()->getUsername()); ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?php echo $this->url("account/summoners"); ?>"
-                           title="Your account's summoners">Summoners</a>
-                    </li>
-                    <li>
-                        <a href="<?php echo $this->url("leet"); ?>" title="Feeds you marked as Leet">Leet</a>
-                    </li>
-                    <li>
-                        <a href="<?php echo $this->url("history"); ?>" title="Your feed history">History</a>
-                    </li>
-                    <li>
-                        <a href="<?php echo $this->url("logout"); ?>" title="Logout from Leetfeed">Logout</a>
-                    </li>
-                <?php endif; ?>
-            </ul>
-        </nav>
     </div>
 </header>
 <div id="content">

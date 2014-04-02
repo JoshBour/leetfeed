@@ -10,6 +10,7 @@ namespace Youtube\Service;
 
 use Youtube\Model\Channel;
 use Youtube\Model\Video;
+use Youtube\Model\Response;
 use Youtube\Model\PlaylistItems;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
@@ -39,9 +40,11 @@ class Youtube implements ServiceManagerAwareInterface
         if ($time == "this_month") {
             $datetime = new \DateTime("-1 month");
         } else if ($time == "this_week") {
-            $datetime = new \DateTime("-1 year");
-        }else if($time == "this_year"){
             $datetime = new \DateTime("-1 week");
+        }else if($time == "this_year"){
+            $datetime = new \DateTime("-1 year");
+        }else{
+            $datetime = new \DateTime("-1 day");
         }
         if($maxResults>50)$maxResults = 5;
         $time = $datetime->format(\DateTime::RFC3339);
@@ -54,15 +57,13 @@ class Youtube implements ServiceManagerAwareInterface
         if($extraParams) $options = array_merge($options,$extraParams);
         if ($nextPageToken) $options["pageToken"] = $nextPageToken;
         $response = $this->youtube->search->listSearch("snippet", $options);
-        $videos = array();
-        foreach ($response["items"] as $result)
-            $videos[] = new Video($result, "searchItem");
-        return $videos;
+        return new Response($response);
     }
 
     public function findRelatedToId($id)
     {
-        return $this->findByQuery(null,array("relatedToVideoId"=>$id));
+        $response = $this->findByQuery(null,array("relatedToVideoId"=>$id));
+        return $response->getVideos();
     }
 
     public function findVideoById($id)

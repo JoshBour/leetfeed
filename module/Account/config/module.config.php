@@ -118,6 +118,9 @@ return array(
     'view_helpers' => array(
         'factories' => array(
             'account' => 'Account\Factory\AccountViewHelperFactory'
+        ),
+        'invokables' => array(
+            'mobile' => 'Account\View\Helper\Mobile'
         )
     ),
     'view_manager' => array(

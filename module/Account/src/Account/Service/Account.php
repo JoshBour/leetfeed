@@ -38,6 +38,8 @@ class Account implements ServiceManagerAwareInterface{
      */
     private $leagueService;
 
+    private $groupRepository;
+
     private $summonerRepository;
 
     public function removeSummoner($summonerId){
@@ -84,13 +86,14 @@ class Account implements ServiceManagerAwareInterface{
         $form = $this->getRegisterForm();
         $account = new \Account\Entity\Account();
         $disabledUsernames = $this->getServiceManager()->get('Config')['disabled_usernames'];
-
+        $group = $this->getGroupRepository()->find(2);
 
         $form->bind($account);
         $form->setData($data);
         if(!$form->isValid()){
             return false;
         }
+        $account->addGroups($group);
         $account->setIp($_SERVER["REMOTE_ADDR"]);
         $account->setFirstSeen(date("Y-m-d H:i:s", time()));
         if(in_array(strtolower($account->getUsername()),$disabledUsernames)){
@@ -137,7 +140,7 @@ class Account implements ServiceManagerAwareInterface{
     }
 
     /**
-     * Retrieve the account plugin
+     * Retrieve the active account
      *
      * @return \Account\Entity\Account
      */
@@ -197,6 +200,18 @@ class Account implements ServiceManagerAwareInterface{
         $this->serviceManager = $serviceManager;
         return $this;
     }
+
+    /**
+     * Retrieve the group repository
+     *
+     * @return EntityRepository
+     */
+    public function getGroupRepository(){
+        if(null === $this->groupRepository)
+            $this->groupRepository = $this->getEntityManager()->getRepository('\Account\Entity\Group');
+        return $this->groupRepository;
+    }
+
 
     /**
      * Retrieve the summoner repository

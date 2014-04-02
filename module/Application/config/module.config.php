@@ -66,16 +66,16 @@ return array(
                     ),
                 ),
             ),
-//            'test' => array(
-//                'type' => 'Zend\Mvc\Router\Http\Literal',
-//                'options' => array(
-//                    'route'    => '/test',
-//                    'defaults' => array(
-//                        'controller' => 'Application\Controller\Index',
-//                        'action'     => 'test',
-//                    ),
-//                ),
-//            ),
+            'test' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/test',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action'     => 'test',
+                    ),
+                ),
+            ),
             'contact' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
@@ -124,10 +124,13 @@ return array(
         'exception_template'       => 'error/index',
         'template_map' => array(
             'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
-            'layout/mobile'           => __DIR__ . '/../view/layout/mobile.phtml',
             'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
+            'head'                    => __DIR__ . '/../view/partial/head.phtml',
+            'footer'                  => __DIR__ . '/../view/partial/footer.phtml',
+            'navigation'              => __DIR__ . '/../view/partial/navigation.phtml',
+            'navigation_mobile'       => __DIR__ . '/../view/partial/navigation.mobile.phtml',
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',

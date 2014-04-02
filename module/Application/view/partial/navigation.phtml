@@ -1,0 +1,56 @@
+<?php $hasPrivileges = $this->identity() ? $this->account()->hasSuperPrivileges() : false; ?>
+<div class="fb-like" data-href="https://www.facebook.com/leetfeed" data-layout="button_count" data-action="like"
+     data-show-faces="false" data-share="false"></div>
+<nav>
+    <ul>
+        <li>
+            <a href="<?php echo $this->url("random"); ?>" title="Find a random feed">Random</a>
+        </li>
+        <li>
+            <a href="<?php echo $this->url("famous"); ?>" title="Feeds by famous people">Famous</a>
+        </li>
+        <li>
+            <a href="<?php echo $this->url("improve"); ?>" title="Feeds to improve your skills!">Improve</a>
+        </li>
+        <?php if (!$this->identity()): ?>
+            <li>
+                <a href="<?php echo $this->url("login"); ?>" title="Login to Leetfeed">Login</a>
+            </li>
+            <li>
+                <a href="<?php echo $this->url("register"); ?>" title="Register to Leetfeed">Register</a>
+            </li>
+        <?php else: ?>
+            <li id="userNav">
+                <a href="#"
+                   title="<?php echo $this->translate("My Profile"); ?>" id="navToggle">
+
+                    <?php echo ucfirst($this->identity()->getUsername()); ?>
+                </a>
+                <ul id="submenu">
+                    <?php if($this->identity() && $this->account()->hasSuperPrivileges()): ?>
+                    <li>
+                        <a href="<?php echo $this->url("feed/add"); ?>" title="Add Feed">Add Feed</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $this->url("feed/generate"); ?>" title="Generate Feed">Generate</a>
+                    </li>
+                    <?php endif; ?>
+                    <li>
+                        <a href="<?php echo $this->url("account/summoners"); ?>"
+                           title="Your account's summoners">Summoners</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $this->url("leet"); ?>" title="Feeds you marked as Leet">Leet</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $this->url("history"); ?>" title="Your feed history">History</a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $this->url("logout"); ?>" title="Logout from Leetfeed">Logout</a>
+                    </li>
+                </ul>
+            </li>
+
+        <?php endif; ?>
+    </ul>
+</nav>

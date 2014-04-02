@@ -7,6 +7,7 @@ $feedId = $feed->getFeedId();
 $author = $feed->getAuthor();
 $comments = $feed->getComments();
 $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '..' : $feed->getTitle();
+$hasPrivileges = $this->account() ? $this->account()->hasSuperPrivileges() : false;
 ?>
 <div id="main">
     <div id="feed" class="feed-<?php echo $feedId; ?>" itemscope="video" itemtype="http://schema.org/VideoObject">
@@ -31,7 +32,7 @@ $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '.
             <div id="title"><?php echo $title; ?></div>
             <div id="uploaded">by <a href="http://www.youtube.com/user/<?php echo $author; ?>" id="uploader"
                                      target="_blank"><?php echo $author; ?></a></div>
-            <div id="rating">
+            <div id="rating" class="feedRating">
                 <?php
                 $account = $this->account();
                 if ($account && $rating = $account->getRated($feedId)) {
@@ -47,11 +48,11 @@ $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '.
                     $down = '';
                 }
                 ?>
-                <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>" id="thumbUp"
+                <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>" class="thumbUp"
                    <?php echo $up; ?>title="I like this feed!"><span class="icon"/></span>
                     Leet</a>
                 <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>"
-                   id="thumbDown"<?php echo $down; ?> title="This feed is meh."><span class="icon"></span>Meh</a>
+                   class="thumbDown"<?php echo $down; ?> title="This feed is meh."><span class="icon"></span>Meh</a>
 
                 <div id="total"><span class="icon"></span><span class="count"><?php echo $feed->getRating(); ?></span>
                 </div>
@@ -83,7 +84,7 @@ $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '.
             </div>
         </div>
     </div>
-    <div id="related" class="module shadowed">
+    <div id="related" class="module">
         <div class="hideToggle shadowed">Hide</div>
         <h1>Related Feeds</h1>
 
@@ -91,7 +92,7 @@ $title = strlen($feed->getTitle()) >= 50 ? substr($feed->getTitle(), 0, 50) . '.
             <ul class="verticalFeedList">
                 <?php
                 foreach ($relatedFeeds as $feed) {
-                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false,'hasPrivileges' => $hasPrivileges));
                 }
                 ?>
             </ul>

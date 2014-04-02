@@ -1,0 +1,18 @@
+<div id="main">
+    <div class="module">
+        <div class="moduleBody">
+            <?php if (count($feeds) > 0) { ?>
+                <ul data-token="<?php echo $nextToken; ?>" class="verticalFeedList" id="generatedFeeds">
+                    <?php
+                    foreach ($feeds as $feed) {
+                        echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false, 'hasPrivileges' => true));
+                    }
+                    ?>
+                </ul>
+                <a href="<?php echo $this->url('feed/generate',array('nextToken' => $nextToken)); ?>">Next Page</a>
+            <?php } else { ?>
+                No feeds were found.
+            <?php } ?>
+        </div>
+    </div>
+</div>

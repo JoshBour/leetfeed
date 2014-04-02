@@ -15,13 +15,21 @@ use Zend\Paginator\Paginator;
 
 class FeedRepository extends EntityRepository
 {
-    public function countFeeds($related = null)
+    public function countFeeds($related = null, $ignored = null)
     {
         $query = $this->createQueryBuilder('f')
             ->select('COUNT(f.feedId)');
         if ($related != null) {
             $query = $query->where('f.isRelated = :related')
                 ->setParameter("related", $related);
+        }
+        if ($ignored != null) {
+            if ($related != null) {
+                $query = $query->andWhere('f.isIgnored = :ignored');
+            } else {
+                $query = $query->where('f.isIgnored = :ignored');
+            }
+            $query = $query->setParameter("ignored",$ignored);
         }
         $query = $query->getQuery();
         return $query->getSingleScalarResult();

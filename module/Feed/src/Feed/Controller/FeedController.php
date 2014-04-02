@@ -18,11 +18,21 @@ class FeedController extends AbstractActionController
 {
     const ROUTE_RANDOM = "random";
     const ROUTE_ACCOUNT_SUMMONERS = "account/summoners";
+    const ROUTE_LOGIN = "login";
+    const ROUTE_HOME = "home";
+    const ROUTE_ADD_FEED = "feed/add";
 
     const MESSAGE_RATE_SUCCESS = 'The rating has been saved successfully.';
     const MESSAGE_RATE_FAIL = 'Something went wrong when saving the rating, please try again.';
 
     const ERROR_STORE_FEED = "There was an error when storing the feed.";
+
+    /**
+     * The add feed form
+     *
+     * @var \Zend\Form\Form
+     */
+    private $addFeedForm;
 
     /**
      * The entity manager
@@ -88,23 +98,27 @@ class FeedController extends AbstractActionController
      */
     public function improveAction()
     {
-        $summoners = $this->account() ? $this->account()->getSummoners() : array();
-        if ($summoners->count() <= 0) {
-            return $this->redirect()->toRoute(self::ROUTE_ACCOUNT_SUMMONERS);
-        } else {
-            $summonerId = $this->params()->fromRoute("summonerId", null);
-            $summoner = $summonerId ? $this->getSummonerRepository()->find($summonerId) : $summoners[0];
-            if ($summoner) {
-                $feeds = $this->getFeedService()->getSummonerFeeds($summoner);
-                return new ViewModel(array(
-                    "feeds" => $feeds,
-                    "summoners" => $summoners,
-                    "activeSummonerName" => $summoner->getName(),
-                    "pageTitle" => "Improve your League of Legends play skills"
-                ));
+        if ($this->identity()) {
+            $summoners = $this->account() ? $this->account()->getSummoners() : array();
+            if ($summoners->count() <= 0) {
+                return $this->redirect()->toRoute(self::ROUTE_ACCOUNT_SUMMONERS);
             } else {
-                return $this->notFoundAction();
+                $summonerId = $this->params()->fromRoute("summonerId", null);
+                $summoner = $summonerId ? $this->getSummonerRepository()->find($summonerId) : $summoners[0];
+                if ($summoner) {
+                    $feeds = $this->getFeedService()->getSummonerFeeds($summoner);
+                    return new ViewModel(array(
+                        "feeds" => $feeds,
+                        "summoners" => $summoners,
+                        "activeSummonerName" => $summoner->getName(),
+                        "pageTitle" => "Improve your League of Legends play skills"
+                    ));
+                } else {
+                    return $this->notFoundAction();
+                }
             }
+        } else {
+            return $this->redirect()->toRoute(self::ROUTE_LOGIN);
         }
     }
 
@@ -163,7 +177,7 @@ class FeedController extends AbstractActionController
         if ($request->isXmlHttpRequest()) {
             $success = 0;
             $message = '';
-            if (!$this->identity()) {
+            if ($this->identity()) {
                 $feedId = $this->params()->fromRoute("feedId");
                 $feed = $this->getFeedService()->addFeedToWatched($feedId);
                 if ($feed) {
@@ -199,6 +213,8 @@ class FeedController extends AbstractActionController
             "youtubers" => $youtubers,
             "feeds" => $feeds["feeds"],
             "nextToken" => $feeds["nextToken"],
+            "bodyClass" => "famousPage",
+            "noAds" => true,
             "randomYoutuber" => $randomYoutuber,
             "pageTitle" => "Feeds from the League of Legends pros and famous youtubers"
         ));
@@ -252,7 +268,8 @@ class FeedController extends AbstractActionController
         $account = $this->account();
         return new ViewModel(array(
             "feeds" => $account->getLikedFeeds(),
-            "pageTitle" => "Leeted feeds"
+            "pageTitle" => "Leeted feeds",
+            "noAds" => true
         ));
     }
 
@@ -273,21 +290,98 @@ class FeedController extends AbstractActionController
         return new ViewModel(array(
             "feeds" => $feeds,
             "sort" => $sort,
-            "pageTitle" => "The feeds you have watched"
+            "pageTitle" => "The feeds you have watched",
+            "noAds" => true
         ));
     }
 
-    public function deleteAction(){
-        $feedId = $this->params()->fromRoute("feedId", null);
-        if ($feedId) {
-            /**
-             * @var $feed \Feed\Entity\Feed
-             */
-            $feed = $this->getFeedRepository()->find($feedId);
+    public function addAction()
+    {
+        if ($this->account()->hasSuperPrivileges()) {
+            $form = $this->getAddFeedForm();
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $data = $request->getPost();
+                $form->setData($data);
+                if($form->isValid()){
+                    $feed = $this->getFeedRepository()->findOneBy(array("videoId" => $data["feed"]["url"]));
+                    if(!$feed){
+                        $feed = $this->getFeedService()->add($data);
+                    }
+                    return $this->redirect()->toRoute(self::ROUTE_ADD_FEED);
+                }
+            } else {
+                $feedId = $this->params()->fromRoute("feedId", null);
+                if ($feedId) {
+                    $type = $this->params()->fromRoute("type");
+                    $em = $this->getEntityManager();
+                    if ($type == "exists") {
+                        /**
+                         * @var $feed \Feed\Entity\Feed
+                         */
+                        $feed = $this->getFeedRepository()->find($feedId);
+                        $feed->setIsRelated(0);
+                        $feed->setIsIgnored(0);
+                        $feed->updatePostDate();
+                        $em->persist($feed);
+                        $em->flush();
+                        return $this->redirect()->toRoute(self::ROUTE_HOME);
+                    }
+                }
+                return new ViewModel(array(
+                    "form" => $form,
+                    "noAds" => true
+                ));
+            }
+        }
+        return $this->notFoundAction();
+
+    }
+
+    public function generateAction(){
+        if ($this->identity() && $this->account()->hasSuperPrivileges()) {
+            $nextToken = $this->params()->fromRoute("nextToken");
+            $response = $this->getYoutubeService()->findByQuery("league of legends", null, 50, "this_week",$nextToken);
+            $feedService = $this->getFeedService();
+            $videos = $response->getVideos();
+            $feeds = array();
             $em = $this->getEntityManager();
-            $em->remove($feed);
+            foreach ($videos as $video) {
+                $feeds[] = $feedService->createFromEntry($video,1,false,true,$em);
+            }
             $em->flush();
-            return $this->redirect()->toRoute('home');
+            return new ViewModel(array(
+                "nextToken" => $response->getNextPageToken(),
+                "feeds" => $feeds,
+                "noAds" => true,
+                "bodyClass" => "generatePage"
+            ));
+        }
+        return $this->notFoundAction();
+    }
+
+    public function removeAction()
+    {
+        $feedId = $this->params()->fromRoute("feedId", null);
+        $type = $this->params()->fromRoute("type");
+        if ($feedId) {
+            if ($this->account()->hasSuperPrivileges()) {
+                /**
+                 * @var $feed \Feed\Entity\Feed
+                 */
+                $feed = $this->getFeedRepository()->find($feedId);
+                $em = $this->getEntityManager();
+                if ($type == "delete") {
+                    $em->remove($feed);
+                } else {
+                    $feed->setIsIgnored(1);
+                    $em->persist($feed);
+                }
+                $em->flush();
+                return $this->redirect()->toRoute('home');
+            } else {
+                return $this->notFoundAction();
+            }
         }
     }
 
@@ -306,12 +400,6 @@ class FeedController extends AbstractActionController
              */
             $feed = $this->getFeedRepository()->find($feedId);
             if ($feed) {
-                if ($feed->getIsRelated() == 1) {
-                    $em = $this->getEntityManager();
-                    $feed->setIsRelated(0);
-                    $em->persist($feed);
-                    $em->flush();
-                }
                 if (!$feed->getAuthor()) {
                     $em = $this->getEntityManager();
                     $video = $this->getYoutubeService()->findVideoById($feed->getVideoId());
@@ -329,7 +417,8 @@ class FeedController extends AbstractActionController
                     'ogTags' => $feed->getOgTags(),
                     "pageTitle" => $feed->getTitle(),
                     "relatedFeeds" => $related,
-                    "metaInfo" => $metaInfo
+                    "metaInfo" => $metaInfo,
+                    "bodyClass" => "feedPage"
                 ));
             } else {
                 return $this->redirect()->toRoute(self::ROUTE_RANDOM);
@@ -374,6 +463,16 @@ class FeedController extends AbstractActionController
         }
     }
 
+    /**
+     * Retrieve the add feed form
+     *
+     * @return \Zend\Form\Form
+     */
+    public function getAddFeedForm(){
+        if(null === $this->addFeedForm)
+            $this->addFeedForm = $this->getServiceLocator()->get('add_feed_form');
+        return $this->addFeedForm;
+    }
 
     /**
      * Retrieve the doctrine entity manager

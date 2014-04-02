@@ -20,10 +20,7 @@ return array(
         '/faq',
         '/promote',
         '/contact',
-        '/history',
         '/random',
         '/famous',
-        '/leet',
-        '/improve'
     )
 );

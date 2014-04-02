@@ -11,16 +11,6 @@ class Module
         $eventManager        = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
-        if (preg_match('/ipad|iphone|itouch|android|blackberry|iemobile/', strtolower($_SERVER['HTTP_USER_AGENT']))) {
-            $eventManager -> attach('dispatch', array($this, 'isMobile'), 5);
-        }
-    }
-
-    public function isMobile(MvcEvent $e) {
-      #  $templateStack = $e->getTarget()->getServiceManager()->get('Zend\View\Resolver\TemplatePathStack');
-      #  $templateStack->setDefaultSuffix('mobile.phtml');
-        $viewModel = $e->getViewModel();
-        $viewModel->setTemplate('layout/mobile');
     }
 
     public function getConfig()

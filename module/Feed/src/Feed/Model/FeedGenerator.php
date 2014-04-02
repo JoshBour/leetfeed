@@ -136,7 +136,7 @@ class FeedGenerator implements ServiceManagerAwareInterface
             $feeds = $this->getYoutubeService()->findChannelByUsername($youtuber->getName())->getUploads();
         } else {
             $this->startIndex += 50;
-            $feeds = $this->getYoutubeService()->findByQuery("League of legends game");
+            $feeds = $this->getYoutubeService()->findByQuery("League of legends game")->getVideos();
         }
         return $feeds;
     }

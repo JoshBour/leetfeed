@@ -14,4 +14,7 @@ return array(
   'Feed\Repository\FeedRepository'    => __DIR__ . '/src/Feed/Repository/FeedRepository.php',
   'Feed\Service\Comment'              => __DIR__ . '/src/Feed/Service/Comment.php',
   'Feed\Service\Feed'                 => __DIR__ . '/src/Feed/Service/Feed.php',
+  'Feed\Form\AddFeedForm'             => __DIR__ . '/src/Feed/Form/AddFeedForm.php',
+  'Feed\Form\AddFeedFieldset'         => __DIR__ . '/src/Feed/Form/AddFeedFieldset.php',
+  'Feed\Factory\AddFeedFormFactory'   => __DIR__ . '/src/Feed/Factory/AddFeedFormFactory.php',
 );

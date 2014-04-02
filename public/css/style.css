@@ -67,7 +67,7 @@
 /* ===================================================== */
 
     body {
-        background: #0f0f0f url('../images/body-bg.png');
+        background-color: #111;
         font-family:  'Source Sans Pro', sans-serif;
         color: #fff;
         font-size: 12px;
@@ -115,6 +115,7 @@
 
     header{
         width:100%;
+        position:fixed;
         border-bottom:1px solid #666;
         background:#333 url('../images/top-header-bg.png');
         text-align:center;
@@ -122,7 +123,7 @@
     }
 
     header #topWrapper{
-        width:965px;
+        width:1165px;
         height:40px;
         margin:0 auto;
     }
@@ -214,6 +215,9 @@
         display:block;
         border-bottom: 1px solid #000;
         border-top: 1px solid #333;
+    }
+
+    nav ul ul li a{
         min-width: 120px;
     }
 
@@ -260,8 +264,8 @@
 /* ===================================================== */
 
     #content{
-        background:black url(../images/bg.jpg) repeat-x;
-        padding: 0 5px 20px 5px;
+        background:black url(../images/body-bg.png) repeat;
+        padding: 40px 0 20px 5px;
         border-bottom: 1px solid #555;
         margin: 0 auto 0 auto;
         overflow: hidden;
@@ -280,8 +284,8 @@
     }
 
     #main{
-        width: 979px;
-        margin: 54px auto 0 auto;
+        width: 1165px;
+        margin: 0 auto;
         padding-bottom:35px;
     }
 
@@ -326,9 +330,9 @@
 
 
     .verticalFeedList{
-        max-height: 800px;
         overflow: hidden;
         position:relative;
+        text-align:center;
     }
 
     .verticalFeedList li a{
@@ -337,15 +341,18 @@
     }
 
     .verticalFeedList li{
-        margin: 11px;
+        margin: 30px 15px;
+        display: inline-block;
+        position:relative;
+        width:350px;
         overflow: auto;
         background: #090909;
-        border-bottom: 1px solid #333;
+        border: 1px solid #333;
     }
 
-    .verticalFeedList  li a img{
-        width:250px;
-        height:auto;
+    .verticalFeedList  li .feedThumbnail a img{
+        width:350px;
+        height:200px;
     }
 
     .verticalFeedList .limit-reached{
@@ -353,28 +360,50 @@
         text-align: center;
     }
 
+    .verticalFeedList .feedThumbnail{
+        position:relative;
+        border-top: 1px solid #999;
+    }
+
     .verticalFeedList  .feedBody, .verticalFeedList .feedThumbnail{
         display:inline-block;
     }
 
-    .verticalFeedList .feedThumbnail{
-        margin-right:5px;
-    }
-
     .verticalFeedList  .feedBody{
-        width:700px;
-        max-width:700px;
+        width:100%;
     }
 
-    .verticalFeedList  .feedHeader{
+    .verticalFeedList  .feedTitle{
         padding:10px;
-        background:#134;
+        background: #333 url(../images/flash-bg.png) 50% 50%;
         overflow:hidden;
     }
 
+    .verticalFeedList .feedPremium{
+        color: yellow;
+        float:right;
+    }
+
     .verticalFeedList .feedDelete{
-        float: right;
-        padding: 10px 10px;
+        border: 0;
+        position: absolute;
+        padding: 10px 0;
+        top: 35px;
+        background-color: #111;
+        width: 100%;
+        right: 0;
+        text-align:left;
+        border-bottom: 1px solid #666;
+        border-top: 1px solid #666;
+    }
+
+    .verticalFeedList .feedDelete a{
+        padding: 0 7px;
+        border-right: 1px solid #666;
+    }
+
+    .verticalFeedList .feedDelete a:last-of-type{
+        border-right:none;
     }
 
     .verticalFeedList  .feedDescription{
@@ -384,21 +413,41 @@
         max-height: 90px;
     }
 
-    .verticalFeedList  .feedTitle a{
+    .verticalFeedList a{
         color:white;
     }
 
-    .verticalFeedList  .feedTitle, .verticalFeedList  .feedThumbnail{
-        float:left;
+    .verticalFeedList .feedMeta{
+        display: none;
+        width:100%;
+        position: absolute;
+        padding: 10px 0;
+        background-color: rgba(0,0,0,0.5);
+        bottom: 0;
+        right: 0;
     }
 
     .verticalFeedList .feedShare{
+        padding-right:5px;
         float:right;
+    }
+
+    .verticalFeedList .feedRating{
+        padding-left:5px;
+        float:left;
+    }
+
+    .verticalFeedList .feedRating span{
+        margin-left:3px;
+    }
+
+    .verticalFeedList .feedRating .total{
+        display:inline-block;
     }
 
     /* ===================================================== */
     /*                      Contact Page                     */
-        #contactForm, #loginForm, #registerForm{
+        #contactForm, #loginForm, #registerForm, #addFeedForm{
             width:550px;
             margin:0 auto;
         }
@@ -435,9 +484,7 @@
 
     #faq ol li{
         margin:15px 0;
-        padding-bottom: 15px;
-        border-bottom:1px solid #333;
-        background: #111;
+        padding-bottom: 30px;
     }
 
     #faq span{
@@ -466,11 +513,9 @@
 
         .moduleSort select{
             padding: 11px 11px 10px 11px;
-            border: none;
             margin: 0;
+            border:none;
             width: 110px;
-            background: #222;
-            border-left: 1px solid #333;
             text-align: center;
         }
 
@@ -497,7 +542,7 @@
 
         #youtubers{
             white-space: nowrap;
-            overflow:hidden;
+            overflow-x: auto;
             position:relative;
             padding: 10px 0;
             margin: 0 5px;
@@ -553,12 +598,10 @@
         #addSummonerToggle{
             cursor:pointer;
             padding: 10px;
-            background: #111;
-            border-left: 1px solid #333;
         }
 
         #addSummonerToggle:hover{
-            background:#222;
+            text-decoration: underline;
         }
 
         #addSummoner input, #addSummoner select{
@@ -586,7 +629,7 @@
         ul.summoners li{
             padding: 10px;
             overflow:hidden;
-            margin: 5px 0;
+            margin: 25px 0;
             position:relative;
             background: #111;
             border-top: 1px solid #333;
@@ -619,20 +662,27 @@
         }
 
     /* ===================================================== */
-    /*                    youtube   View                       */
+    /*                    feed page                       */
+
+        #feed{
+            margin-top: 30px;
+        }
 
         #feed iframe{
-            width:965px;
-            height:576px;
+            width:1163px;
+            height:695px;
             border: 1px solid #222;
-            padding: 6px;
             background: #000;
             box-shadow: 11px 10px 23px #000;
         }
 
+        .feedPage .module{
+            margin: 60px 0;
+        }
+
         #info{
             font-size: 21px;
-            background: rgba(0,0,0,0.85);
+            margin-top:30px;
             text-align:center;
         }
 
@@ -661,6 +711,8 @@
                 width: 810px;
                 padding: 10px;
                 border: none;
+                background:none;
+                border-bottom:1px solid #333;
                 margin: 0;
             }
 
@@ -673,10 +725,6 @@
                 position:relative;
                 min-height:300px;
                 max-height:500px;
-            }
-
-            .commentWrapper{
-                border-top: 1px solid #333;
             }
 
             #commentList li{
@@ -727,21 +775,25 @@
             margin-right:5px;
         }
 
-        #thumbUp .icon{background-position: -36px -1px;}
-        #thumbUp.disabled{color:green; cursor:default;}
-        #thumbDown.disabled{color:red; cursor:default;}
-        /*#thumbUp .icon:hover{background-position: -72px -1px;}*/
-        #thumbDown .icon{ background-position: -19px -1px;}
+        .total .icon{background-position: -1px -1px;}
+        .thumbUp .icon{background-position: -70px -1px;}
+        .thumbUp .icon:hover{background-position: -93px -1px;}
+        .thumbUp.disabled{color:green; cursor:default;}
+        .thumbDown .icon{ background-position: -24px -1px;}
+        .thumbDown .icon:hover{background-position: -47px -1px;}
+        .thumbDown.disabled{color:red; cursor:default;}
 
     /* ===================================================== */
     /*                   Common Classes                      */
 
         .module{
             position:relative;
-            background: #000;
-            border: 1px solid #333;
             font-size:15px;
             margin: 20px 0;
+        }
+
+        .bordered{
+            border:1px solid #666;
         }
 
         .module .hideToggle{
@@ -749,8 +801,6 @@
             position: absolute;
             font-size: 19px;
             cursor: pointer;
-            background: #111;
-            border-left: 1px solid #333;
             padding: 7px 10px;
         }
 
@@ -765,14 +815,9 @@
             margin-top:0;
             font:normal 18px 'Gafata', sans-serif;
             color: white;
-            background: #333 url(../images/flash-bg.png) 50% 50%;
-            border-bottom: 1px solid #333;
+            border-bottom: 3px solid #555;
             padding: 8px;
             text-align: left;
-        }
-
-        .module{
-            box-shadow: 5px 5px 12px #000;
         }
 
         .shadowed{
@@ -831,7 +876,7 @@
     }
 
     .videoMask:hover{
-        background: rgba(34,34,34,0.9) url('../images/video-mask-hover.png') center center no-repeat;
+        background: rgba(34,34,34,0.6) url('../images/video-mask-hover.png') center center no-repeat;
     }
 
 
@@ -867,6 +912,7 @@
     #advertisement{
         width: 728px;
         height: 90px;
+        padding-top: 30px;
         margin: 0 auto;
     }
 
@@ -880,7 +926,7 @@
         padding:15px 0;
         overflow:hidden;
         font-size:14px;
-        width:945px;
+        width:1145px;
         margin:0 auto;
         text-align:center;
     }
@@ -935,8 +981,8 @@
     .icon{
         display: inline-block;
         background: url(../images/sprites.png) no-repeat;
-        width:18px;
-        height:18px;
+        width:20px;
+        height:20px;
         vertical-align:middle;
     }
 
@@ -959,20 +1005,20 @@
     }
 
     .fb-share{
-        background: transparent url(../images/sprites.png) -55px -1px no-repeat;
+        background: transparent url(../images/sprites.png) -118px -1px no-repeat;
         margin-right:5px;
     }
 
     .fb-share:hover{
-        background-position: -115px -1px;
+        background-position: -176px -1px;
     }
 
     .twitter-share{
-        background: transparent url(../images/sprites.png) -175px -1px no-repeat;
+        background: transparent url(../images/sprites.png) -237px -1px no-repeat;
     }
 
     .twitter-share:hover{
-        background-position: -235px -1px;
+        background-position: -296px -1px;
     }
 
     .fb-share, .twitter-share{
@@ -981,7 +1027,7 @@
         vertical-align:middle;
         height: 20px;
         text-indent: -9999px;
-        border-radius: 2px;
+        border-radius: 5px;
     }
 
     /* ===================================================== */

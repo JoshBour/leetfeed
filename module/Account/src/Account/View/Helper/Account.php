@@ -9,7 +9,7 @@ namespace Account\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-class User extends AbstractHelper
+class Account extends AbstractHelper
 {
 
     private $serviceManager;
@@ -20,18 +20,24 @@ class User extends AbstractHelper
 
     private $authService;
 
-    public function __invoke()
-    {
+    public function __invoke(){
+        return $this->getAccount();
+    }
+
+    /**
+     * @return bool|\Account\Entity\Account
+     */
+    public function getAccount(){
         $em = $this->getEntityManager();
         $auth = $this->getAuthService();
         $accService = $this->getAccountService();
-        if ($auth->hasIdentity()) {
+        if($auth->hasIdentity()){
             $account = $em->getRepository('Account\Entity\Account')->find($auth->getIdentity()->getAccountId());
 
             $accService->updateLastSeen($account);
             $em->persist($account);
             $em->flush();
-        } else {
+        }else{
             $account = false;
         }
         return $account;

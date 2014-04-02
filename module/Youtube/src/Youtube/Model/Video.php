@@ -54,6 +54,17 @@ class Video
         );
     }
 
+    public function getScore()
+    {
+        $x = ($this->getTotalRating() !== null && $this->getTotalRating() > 0) ? $this->getTotalRating() : 1;
+        return log10($x + ($this->views / 2));
+    }
+
+    public function getTotalRating()
+    {
+        return (null !== $this->rating) ? $this->rating['likes']+$this->rating['dislikes'] : null;
+    }
+
     /**
      * @param \Youtube\Model\Channel $channel
      */

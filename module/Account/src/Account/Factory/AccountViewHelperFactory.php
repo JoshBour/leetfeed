@@ -8,7 +8,7 @@
 
 namespace Account\Factory;
 
-use Account\View\Helper\User;
+use Account\View\Helper\Account;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -22,7 +22,7 @@ class AccountViewHelperFactory implements FactoryInterface{
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
 
-        $helper = new User();
+        $helper = new Account();
         $helper->setServiceManager($serviceLocator->getServiceLocator());
         return $helper;
     }

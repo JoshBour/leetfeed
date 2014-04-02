@@ -59,30 +59,30 @@ class IndexController extends AbstractActionController
         if (!$type) {
             $feedCount = $this->getFeedRepository()->countFeeds();
             $pageCount = $feedCount > 15000 ? $feedCount / 15000 : 1;
-            if(!is_int($pageCount)){
-                $pageCount = intval($pageCount)+1;
+            if (!is_int($pageCount)) {
+                $pageCount = intval($pageCount) + 1;
             }
             $sitemapXmlParser->addHeader("sitemapindex");
             $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/static");
             for ($i = 0; $i < $pageCount; $i++)
                 $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/dynamic/" . $i * 15000 . "-" . ($i + 1) * 15000);
 
-        }else{
+        } else {
             $pages = array();
-            if($type == "static"){
+            if ($type == "static") {
                 $pages = $this->getServiceLocator()->get('Config')['static_pages'];
-            }else{
+            } else {
                 $index = $this->params()->fromRoute("index");
-                $limits = explode("-",$index);
-                $feeds = $this->getFeedRepository()->findBy(array(),array(),15000,$limits[0]);
-                foreach($feeds as $feed){
-                    $pages[] = "/feed/".$feed->getFeedId();
+                $limits = explode("-", $index);
+                $feeds = $this->getFeedRepository()->findBy(array(), array(), 15000, $limits[0]);
+                foreach ($feeds as $feed) {
+                    $pages[] = "/feed/" . $feed->getFeedId();
                 }
             }
             $sitemapXmlParser->addHeader("urlset");
             $i = 0;
-            foreach($pages as $page){
-                if($i == 20){
+            foreach ($pages as $page) {
+                if ($i == 20) {
                     $sitemapXmlParser->show();
                     $i = 0;
                 }
@@ -106,28 +106,21 @@ class IndexController extends AbstractActionController
      */
     public function indexAction()
     {
+        $feedNumber = 24;
+        $hasPrivileges = ($this->account()) ? $this->account()->hasSuperPrivileges() : false;
         $feedRepository = $this->getFeedRepository();
-        $accountsHistoryRepository = $this->getAccountsHistoryRepository();
-        $feeds = $feedRepository->findBy(array("isRelated" => 0), array("rating" => "DESC"), 50);
-        $premiumFeeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"), 50);
-        $latestFeeds = $accountsHistoryRepository->findBy(array(), array("watchTime" => "DESC"), 50);
+        $feeds = $feedRepository->findBy(array("isRelated" => 0,"isIgnored" => 0), array("postDate" => "DESC","rating" => "DESC"), $feedNumber);
+        $premiumFeeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"), $feedNumber);
 
-        $feedCnt = $feedRepository->countFeeds("0");
-        $feedTotalPages = intval(floor($feedCnt / 50));
-
-        $latestFeedCnt = $accountsHistoryRepository->countFeeds();
-        $latestFeedsTotalPages = intval($latestFeedCnt / 50);
-
-        $premiumFeeds = new Paginator(new ArrayAdapter($premiumFeeds));
-        $premiumFeeds->setCurrentPageNumber(1);
-        $premiumFeeds->setItemCountPerPage(50);
+        $feedCnt = $feedRepository->countFeeds("0","0");
+        $feedTotalPages = intval(floor($feedCnt / $feedNumber));
 
         return new ViewModel(array(
             "feeds" => $feeds,
             "feedPages" => $feedTotalPages,
+            "hasPrivileges" => $hasPrivileges,
             "premiumFeeds" => $premiumFeeds,
-            "latestFeedPages" => $latestFeedsTotalPages,
-            "latestFeeds" => $latestFeeds,
+            "bodyClass" => "mainPage"
         ));
     }
 
@@ -141,19 +134,16 @@ class IndexController extends AbstractActionController
     public function getMoreFeedsAction()
     {
         if ($this->getRequest()->isXmlHttpRequest()) {
+            $feedNumber = 24;
             $category = $this->params()->fromRoute("category");
             $page = $this->params()->fromRoute("page", 1);
             $isPremium = false;
             switch ($category) {
                 case "top-feeds":
-                    $feeds = $this->getFeedRepository()->findBy(array("isRelated" => 0), array("rating" => "DESC"), 50, 50 * $page);
+                    $feeds = $this->getFeedRepository()->findBy(array("isRelated" => 0,"isIgnored" => 0), array("rating" => "DESC","postDate" => "DESC"), $feedNumber, $feedNumber * $page);
                     break;
                 case "premium-feeds":
-                    $feeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"), 50, 50 * $page);
-                    $isPremium = true;
-                    break;
-                case "latest-feeds":
-                    $feeds = $this->getAccountsHistoryRepository()->findBy(array(), array("watchTime" => "DESC"), 50, 50 * $page);
+                    $feeds = $this->getPremiumFeedRepository()->findBy(array(), array('visits' => "ASC"), $feedNumber, $feedNumber * $page);
                     $isPremium = true;
                     break;
                 default:
@@ -183,9 +173,13 @@ class IndexController extends AbstractActionController
         if ($this->identity()) {
             $summoners = $this->account()->getSummoners();
             $summoner = $summoners[0];
-            $feeds = $this->getServiceLocator()->get('feed_service')->getSummonerFeeds($summoner);
+            $response = $this->getServiceLocator()->get('youtube_service')->findByQuery("league of legends", null, 20, "this_week");
+            $videos = $response->getVideos(true);
+            foreach ($videos as $video) {
+                echo $video->getScore() . '<br />';
+            }
             # $feeds = $this->getServiceLocator()->get('feed_service')->getLolProFeeds(array("Ahri","Aatrox","Jayce"));
-            return new ViewModel(array("feeds" => $feeds));
+            return new ViewModel();
         } else {
             return $this->notFoundAction();
         }
@@ -200,7 +194,8 @@ class IndexController extends AbstractActionController
     public function faqAction()
     {
         return new ViewModel(array(
-            "pageTitle" => "Frequently Asked Questions"
+            "pageTitle" => "Frequently Asked Questions",
+            "noAds" => true
         ));
     }
 
@@ -213,7 +208,8 @@ class IndexController extends AbstractActionController
     public function promoteAction()
     {
         return new ViewModel(array(
-            "pageTitle" => "Promote your feeds!"
+            "pageTitle" => "Promote your feeds!",
+            "noAds" => true
         ));
     }
 
@@ -265,7 +261,8 @@ class IndexController extends AbstractActionController
         }
         return new ViewModel(array(
             "form" => $form,
-            "pageTitle" => "Contact Us"
+            "pageTitle" => "Contact Us",
+            "noAds" => true
         ));
     }
 

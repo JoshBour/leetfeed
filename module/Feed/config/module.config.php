@@ -99,6 +99,16 @@ return array(
                             ),
                         ),
                     ),
+                    'generate' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/generate[/:nextToken]',
+                            'defaults' => array(
+                                'action' => 'generate',
+                                'nextToken' => null,
+                            ),
+                        ),
+                    ),
                     'view' => array(
                         'type' => 'Zend\Mvc\Router\Http\Segment',
                         'options' => array(
@@ -111,15 +121,30 @@ return array(
                             ),
                         ),
                     ),
-                    'delete' => array(
+                    'remove' => array(
                         'type' => 'Zend\Mvc\Router\Http\Segment',
                         'options' => array(
-                            'route' => '/delete/:feedId',
+                            'route' => '/remove/:feedId/:type',
                             'defaults' => array(
-                                'action' => 'delete',
+                                'action' => 'remove',
                             ),
                             'constraints' => array(
                                 'feedId' => '[0-9]+',
+                                'type' => 'delete|ignore'
+                            ),
+                        ),
+                    ),
+                    'add' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/add/[:feedId[/:type]]',
+                            'defaults' => array(
+                                'action' => 'add',
+                                'type' => 'new'
+                            ),
+                            'constraints' => array(
+                                'feedId' => '[0-9]+',
+                                'type' => 'exists|new'
                             ),
                         ),
                     ),
@@ -199,6 +224,9 @@ return array(
             'comment_service' => 'Feed\Service\Comment',
             'generator' => 'Feed\Model\FeedGenerator',
         ),
+        'factories' => array(
+            'add_feed_form' => 'Feed\Factory\AddFeedFormFactory'
+        )
     ),
     'controllers' => array(
         'invokables' => array(

@@ -46,6 +46,15 @@ class Account
     private $firstSeen;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Group", inversedBy="accounts")
+     * @ORM\JoinTable(name="accounts_groups",
+     *      joinColumns={@ORM\JoinColumn(name="account_id", referencedColumnName="account_id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="group_id")}
+     *      )
+     */
+    private $groups;
+
+    /**
      * @ORM\Column(type="string")
      * @ORM\Column(length=50)
      */
@@ -111,6 +120,17 @@ class Account
         $this->feeds = new ArrayCollection();
         $this->ratings = new ArrayCollection();
         $this->summoners = new ArrayCollection();
+        $this->groups = new ArrayCollection();
+    }
+
+    public function hasSuperPrivileges(){
+        /**
+         * @var $group
+         */
+        foreach($this->groups as $group){
+            if($group->getGroupId() >=5 ) return true;
+        }
+        return false;
     }
 
     /**
@@ -254,6 +274,46 @@ class Account
     public function getFirstSeen()
     {
         return $this->firstSeen;
+    }
+
+    /**
+     * @param mixed $groups
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param $groups
+     */
+    public function addGroups($groups){
+        if(is_array($groups)){
+            foreach($groups as $group)
+                $this->groups->add($group);
+        }else{
+            $this->groups->add($groups);
+        }
+    }
+
+    /**
+     * @param $groups
+     */
+    public function removeGroups($groups){
+        if(is_array($groups)){
+            foreach($groups as $group)
+                $this->groups->removeElement($group);
+        }else{
+            $this->groups->removeElement($groups);
+        }
     }
 
     /**

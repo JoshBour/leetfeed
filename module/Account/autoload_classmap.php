@@ -4,6 +4,7 @@ return array(
   'Account\Module'                               => __DIR__ . '/Module.php',
   'Account\Controller\AccountController'         => __DIR__ . '/src/Account/Controller/AccountController.php',
   'Account\Entity\Account'                       => __DIR__ . '/src/Account/Entity/Account.php',
+  'Account\Entity\Group'                         => __DIR__ . '/src/Account/Entity/Group.php',
   'Account\Entity\AccountsHistory'               => __DIR__ . '/src/Account/Entity/AccountsHistory.php',
   'Account\Factory\AccountPluginFactory'         => __DIR__ . '/src/Account/Factory/AccountPluginFactory.php',
   'Account\Factory\AccountViewHelperFactory'     => __DIR__ . '/src/Account/Factory/AccountViewHelperFactory.php',
@@ -19,5 +20,6 @@ return array(
   'Account\Repository\AccountRepository'         => __DIR__ . '/src/Account/Repository/AccountRepository.php',
   'Account\Repository\AccountsHistoryRepository' => __DIR__ . '/src/Account/Repository/AccountsHistoryRepository.php',
   'Account\Service\Account'                      => __DIR__ . '/src/Account/Service/Account.php',
-  'Account\View\Helper\User'                     => __DIR__ . '/src/Account/View/Helper/User.php',
+  'Account\View\Helper\Account'                     => __DIR__ . '/src/Account/View/Helper/Account.php',
+  'Account\View\Helper\Mobile'                     => __DIR__ . '/src/Account/View/Helper/Mobile.php',
 );

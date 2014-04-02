@@ -18,8 +18,9 @@
             <?php if (count($feeds) > 0) { ?>
                 <ul class="verticalFeedList">
                     <?php
+                    $hasPrivileges = $this->account() ? $this->account()->hasSuperPrivileges() : false;
                     foreach ($feeds as $feed) {
-                        echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                        echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false, 'hasPrivileges' => $hasPrivileges));
                     }
                     ?>
                 </ul>

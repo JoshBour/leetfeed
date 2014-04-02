@@ -1,6 +1,7 @@
 <div id="main">
     <div class="module">
         <h1>Youtubers / Pros</h1>
+
         <div class="moduleBody">
             <ul id="youtubers">
                 <?php foreach ($youtubers as $youtuber): ?>
@@ -15,12 +16,14 @@
     </div>
     <div class="module">
         <h1><?php echo $randomYoutuber->getIgName(); ?>'s Latest Feeds</h1>
+
         <div class="moduleBody">
             <?php if (count($feeds) > 0) { ?>
-                <ul data-token="<?php echo $nextToken; ?>"  class="verticalFeedList" id="youtubersFeeds">
+                <ul data-token="<?php echo $nextToken; ?>" class="verticalFeedList" id="youtubersFeeds">
                     <?php
+                    $hasPrivileges = $this->account() ? $this->account()->hasSuperPrivileges() : false;
                     foreach ($feeds as $feed) {
-                        echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false));
+                        echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false, 'hasPrivileges' => $hasPrivileges));
                     }
                     ?>
                 </ul>

@@ -1,0 +1,34 @@
+<div id="main">
+    <div class="module halfSized">
+        <h1>Add a new feed</h1>
+        <?php
+        $form->prepare();
+        $form->setAttribute('action', $this->url('feed/add'));
+        $fieldset = $form->get('feed');
+
+        echo $this->form()->openTag($form);
+        echo $this->formHidden($form->get('security'));
+        ?>
+        <div class="element">
+            <?php
+            echo $this->formElementErrors($fieldset->get('title'), array('class' => 'formError'));
+            echo $this->formLabel($fieldset->get('title'));
+            echo $this->formInput($fieldset->get('title'));
+            ?>
+        </div>
+
+        <div class="element">
+            <?php
+            echo $this->formElementErrors($fieldset->get('url'), array('class' => 'formError'));
+            echo $this->formLabel($fieldset->get('url'));
+            echo $this->formInput($fieldset->get('url'));
+            ?>
+        </div>
+
+        <div class="element">
+            <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Add'))); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag() ?>
+    </div>
+</div>

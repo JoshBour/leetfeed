@@ -1,17 +1,9 @@
-#content {
-    overflow: inherit;
+header{
+    position:relative;
 }
 
-#main, footer, .module, #login, #register, header #topWrapper, #contactForm, #loginForm, #registerForm {
-    width: auto;
-}
-
-#main {
-    margin-top: 20px;
-}
-
-.module, #register, #login {
-    margin: 20px;
+footer, header #topWrapper, #main, .module, #login, #register, #contactForm, #loginForm, #registerForm {
+    width:100%;
 }
 
 #topWrapper {
@@ -40,45 +32,6 @@
     float: right;
 }
 
-.module h1 {
-    font-size: 14px;
-}
-
-.module .hideToggle {
-    font-size: 16px;
-}
-
-.module .verticalFeedList .feedBody, .module .verticalFeedList .feedThumbnail {
-    width: 50%;
-    float: left;
-}
-
-.verticalFeedList .feedThumbnail {
-    margin-right: 0;
-}
-
-.module .verticalFeedList .feedThumbnail img {
-    width: 95%;
-    height: auto;
-}
-
-.moduleSort select {
-    padding: 8px;
-}
-
-#announcement {
-    width: 100%;
-    padding: 10px 0;
-    overflow: visible;
-}
-
-#announcement .remove {
-    position: absolute;
-    font-size: 20px;
-    right: 0;
-    top: -10px;
-}
-
 header nav ul li {
     padding-top: 8px;
     height: 32px;
@@ -102,36 +55,25 @@ nav ul #userNav {
     border-bottom: 1px solid #777;
 }
 
-.verticalFeedList .feedTitle, .verticalFeedList .feedShare {
-    float: none;
-    display: block;
-}
-
-.verticalFeedList .feedShare {
-    margin: 7px 0;
-}
-
-.fb-share, .twitter-share {
-    width: 20px;
-}
-
-.verticalFeedList .feedHeader {
-    padding: 5px;
-}
-
-#info .moduleBody {
-    overflow: auto;
-}
-
-#feed iframe {
-    width: 100%;
-    height: auto;
-    margin: 0 auto;
-    padding: 0;
-}
-
-#logo {
+#logo , footer p{
     margin-left: 5px;
+}
+
+#content{
+    padding:0;
+}
+
+.verticalFeedList li{
+    margin: 15px 0;
+}
+
+.verticalFeedList .feedMeta{
+    display:block;
+}
+
+#advertisement {
+    width: 320px;
+    height: auto;
 }
 
 .commentWrapper {
@@ -151,16 +93,27 @@ input#addComment {
     text-indent: 5px;
 }
 
+.standardForm{
+    padding:0;
+}
+
 #progress_bar {
     width: auto;
     margin: 30px auto;
 }
 
-footer p {
-    margin-Left: 5px;
+/** Feed Page **/
+#feed iframe {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    padding: 0;
 }
 
-#advertisement {
-    width: auto;
-    height: auto;
+#share, #rating{
+    margin-top: 5px;
+}
+
+#info .moduleBody {
+    overflow: auto;
 }

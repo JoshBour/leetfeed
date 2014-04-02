@@ -28,9 +28,9 @@ class Feed implements ServiceManagerAwareInterface
     private $serviceManager;
 
     /**
-     * @var EntityRepository
+     * @var \Account\Entity\Account
      */
-    private $accountPlugin;
+    private $account;
 
     /**
      * @var EntityRepository
@@ -61,6 +61,24 @@ class Feed implements ServiceManagerAwareInterface
      * @var EntityRepository
      */
     private $championRepository;
+
+    public function add($data)
+    {
+        $youtubeService = $this->getYoutubeService();
+        $em = $this->getEntityManager();
+        parse_str(parse_url($data["feed"]["url"], PHP_URL_QUERY), $vars);
+        $video = $youtubeService->findVideoById($vars['v']);
+        $title = $data["feed"]["title"] ? $data["feed"]["title"] : $video->getTitle();
+        $feed = $this->createFromEntry($video, 0, false);
+        $feed->setTitle($title);
+        try {
+            $em->persist($feed);
+            $em->flush();
+        } catch (\Exception $e) {
+            return false;
+        }
+        return $feed;
+    }
 
     /**
      * @param $summoner
@@ -118,7 +136,7 @@ class Feed implements ServiceManagerAwareInterface
 
     public function getYoutuberUploads($youtuber, $nextToken = null)
     {
-        $feeds = $youtuber->getFeeds();
+        # $feeds = $youtuber->getFeeds();
         $channel = $this->getYoutubeService()->findChannelByUsername($youtuber->getName());
         $feedRepository = $this->getFeedRepository();
         $game = $this->getGameRepository()->find(1);
@@ -127,32 +145,31 @@ class Feed implements ServiceManagerAwareInterface
         $persistYoutuber = false;
         $uploadsPlaylist = $channel->getUploadsPlaylist(50, $nextToken);
         $uploads = $uploadsPlaylist->getVideos();
-
-        if (count($feeds) != count($uploads)) {
-            $feeds = array();
-            /**
-             * @var $video \Youtube\Model\Video
-             */
-            foreach ($uploads as $video) {
-                if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
-                    $feed = \Feed\Entity\Feed::create($game,
-                        $video->getId(),
-                        $video->getTitle(),
-                        $channel->getTitle(),
-                        $video->getDescription(), 1, 0);
-                    $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
-                    if (!$isPersisted) $em->persist($feed);
-                    $flush = true;
-                }
-                if (!$youtuber->hasFeed($feed)) {
-                    $feeds[] = $feed;
-                    $youtuber->addFeeds($feed);
-                    $persistYoutuber = true;
-                }
+        #  if (count($feeds) != count($uploads)) {
+        $feeds = array();
+        /**
+         * @var $video \Youtube\Model\Video
+         */
+        foreach ($uploads as $video) {
+            if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
+                $feed = \Feed\Entity\Feed::create($game,
+                    $video->getId(),
+                    $video->getTitle(),
+                    $channel->getTitle(),
+                    $video->getDescription(), 1, 0);
+                $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
+                if (!$isPersisted) $em->persist($feed);
+                $flush = true;
             }
-            if ($persistYoutuber) $em->persist($youtuber);
-            if ($flush) $em->flush();
+            if (!$youtuber->hasFeed($feed)) {
+                $feeds[] = $feed;
+                #  $youtuber->addFeeds($feed);
+                #   $persistYoutuber = true;
+            }
         }
+        #   if ($persistYoutuber) $em->persist($youtuber);
+        if ($flush) $em->flush();
+        # }
         return array("feeds" => $feeds,
             "nextToken" => $uploadsPlaylist->getNextPageToken());
     }
@@ -161,19 +178,21 @@ class Feed implements ServiceManagerAwareInterface
      * @param \Youtube\Model\Video $video
      * @param int $related
      * @param bool $flush
+     * @param bool $persist
+     * @param EntityManager $em
      * @return \Feed\Entity\Feed
      */
-    public function createFromEntry($video, $related = 1, $flush = true)
+    public function createFromEntry($video, $related = 1, $flush = true, $persist = true, &$em = null)
     {
         $game = $this->getGameRepository()->find(1);
         $feedRepository = $this->getFeedRepository();
         if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
-            $em = $this->getEntityManager();
             $feed = \Feed\Entity\Feed::create($game, $video->getId(), $video->getTitle(), $video->getChannel()->getTitle(), $video->getDescription(), $related);
-            $this->getEntityManager()->persist($feed);
+            $em = $em ? $em : $this->getEntityManager();
             $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
-            if (!$isPersisted) $em->persist($feed);
+            if (!$isPersisted && $persist) $em->persist($feed);
             if ($flush) $em->flush();
+
         }
         return $feed;
     }
@@ -187,7 +206,7 @@ class Feed implements ServiceManagerAwareInterface
         $feed = $this->getFeedRepository()->find($feedId);
         if ($feed) {
             $em = $this->getEntityManager();
-            $account = $this->getAccountPlugin()->getAccount();
+            $account = $this->getAccount();
             if (!$this->getWatchedFeedRepository()->findOneBy(array("feed" => $feed, "account" => $account))) {
                 $watchedFeed = \Account\Entity\AccountsHistory::create($account, $feed);
                 $account->addFeeds($watchedFeed);
@@ -211,7 +230,7 @@ class Feed implements ServiceManagerAwareInterface
     {
         $em = $this->getEntityManager();
         $feed = $this->getFeedRepository()->find($id);
-        $account = $this->getAccountPlugin()->getAccount();
+        $account = $this->getAccount();
         $rating = ($rating == 'thumbUp') ? 1 : 0;
         $rateEntity = $em->getRepository('Feed\Entity\Rating')->findOneBy(array(
                 'account' => $account->getAccountId(),
@@ -424,15 +443,15 @@ class Feed implements ServiceManagerAwareInterface
     }
 
     /**
-     * Retrieve the account plugin
+     * Retrieve the active account
      *
-     * @return \Account\Plugin\ActiveAccount
+     * @return \Account\Entity\Account
      */
-    public function getAccountPlugin()
+    public function getAccount()
     {
-        if (null === $this->accountPlugin)
-            $this->accountPlugin = $this->getServiceManager()->get('ControllerPluginManager')->get('account');
-        return $this->accountPlugin;
+        if (null === $this->account)
+            $this->account = $this->getServiceManager()->get('ControllerPluginManager')->get('account')->getAccount();
+        return $this->account;
     }
 
     /**

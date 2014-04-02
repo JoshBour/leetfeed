@@ -1,0 +1,5 @@
+<?php
+foreach ($feeds as $feed) {
+    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false, 'hasPrivileges' => true));
+}
+?>

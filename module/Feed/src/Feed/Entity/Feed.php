@@ -51,21 +51,27 @@ class Feed {
 
     /**
      * @ORM\Column(type="smallint")
-     * @ORM\Column(name="is_related")
+     * @ORM\Column(name="is_ignored")
      */
-    private $isRelated;
+    private $isIgnored;
 
     /**
      * @ORM\Column(type="smallint")
-     * @ORM\Column(name="is_rising")
+     * @ORM\Column(name="is_related")
      */
-    private $isRising;
+    private $isRelated;
 
     /**
      * @ORM\Column(type="integer")
      * @ORM\Column(length=11)
      */
     private $rating;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="post_date")
+     */
+    private $postDate;
 
     /**
      * @ORM\OneToMany(targetEntity="Rating", mappedBy="feed")
@@ -111,18 +117,19 @@ class Feed {
      * @param string $author
      * @param string $description
      * @param int $related
-     * @param int $rising
+     * @param int $ignored
      * @return Feed
      */
-    public static function create($game,$videoId,$title,$author,$description,$related = 1,$rising=0){
+    public static function create($game,$videoId,$title,$author,$description,$related = 1,$ignored=0){
         $feed = new Feed();
         $feed->setGame($game);
         $feed->setVideoId($videoId);
-        $feed->setTitle(htmlentities($title));
+        $feed->setTitle($feed->sanitize($title,80));
         $feed->setAuthor($author);
-        $feed->setDescription(htmlentities($description));
+        $feed->setDescription($feed->sanitize($description,200));
         $feed->setRating(0);
-        $feed->setIsRising($rising);
+        $feed->setPostDate(date("Y-m-d H:i:s"));
+        $feed->setIsIgnored($ignored);
         $feed->setIsRelated($related);
         return $feed;
     }
@@ -135,9 +142,17 @@ class Feed {
         $this->relatedFeedsToMe = new ArrayCollection();
     }
 
+    public function updatePostDate(){
+        $this->postDate = date("Y-m-d H:i:s");
+    }
+
     public function getCleanDescription($maxLength = 200){
-        $description = strlen($this->description) > $maxLength ? substr($this->description, 0, $maxLength) . ".." : $this->description;
-        return htmlentities($description);
+        return $this->sanitize($this->description,$maxLength);
+    }
+
+    private function sanitize($data,$length){
+        $data = strlen($data) > $length ? substr($data, 0, $length) . ".." : $data;
+        return htmlentities($data);
     }
 
     public function getKeywords(){
@@ -290,6 +305,22 @@ class Feed {
     }
 
     /**
+     * @param mixed $isIgnored
+     */
+    public function setIsIgnored($isIgnored)
+    {
+        $this->isIgnored = $isIgnored;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsIgnored()
+    {
+        return $this->isIgnored;
+    }
+
+    /**
      * @param mixed $isRelated
      */
     public function setIsRelated($isRelated)
@@ -306,19 +337,19 @@ class Feed {
     }
 
     /**
-     * @param mixed $isRising
+     * @param mixed $postDate
      */
-    public function setIsRising($isRising)
+    public function setPostDate($postDate)
     {
-        $this->isRising = $isRising;
+        $this->postDate = $postDate;
     }
 
     /**
      * @return mixed
      */
-    public function getIsRising()
+    public function getPostDate()
     {
-        return $this->isRising;
+        return $this->postDate;
     }
 
     /**
