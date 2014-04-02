@@ -117,3 +117,7 @@ input#addComment {
 #info .moduleBody {
     overflow: auto;
 }
+
+#announcement{
+    width: inherit;
+}

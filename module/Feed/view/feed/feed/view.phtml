@@ -13,8 +13,8 @@ $hasPrivileges = $this->account() ? $this->account()->hasSuperPrivileges() : fal
     <div id="feed" class="feed-<?php echo $feedId; ?>" itemscope="video" itemtype="http://schema.org/VideoObject">
         <span itemprop="name" class="inactive"><?php echo $title; ?></span>
         <span class="inactive" itemprop="description"><?php echo $feed->getCleanDescription(); ?></span>
-        <meta itemprop="thumbnailURL" content="<?php echo $feed->getThumbnail("high"); ?>" />
-        <meta itemprop="embedURL" content="https://youtube.googleapis.com/v/<?php echo $id; ?>" />
+        <meta itemprop="thumbnailURL" content="<?php echo $feed->getThumbnail("high"); ?>"/>
+        <meta itemprop="embedURL" content="https://youtube.googleapis.com/v/<?php echo $id; ?>"/>
         <iframe width="965" height="576" src="http://www.youtube.com/embed/<?php echo $id; ?>?enablejsapi=1&autoplay=1"
                 frameborder="0"
                 allowfullscreen></iframe>
@@ -37,22 +37,22 @@ $hasPrivileges = $this->account() ? $this->account()->hasSuperPrivileges() : fal
                 $account = $this->account();
                 if ($account && $rating = $account->getRated($feedId)) {
                     if ($rating->getRating() == 1) {
-                        $up = ' class=" disabled" ';
+                        $up = ' disabled';
                         $down = '';
                     } else {
                         $up = '';
-                        $down = ' class=" disabled" ';
+                        $down = ' disabled';
                     }
                 } else {
                     $up = '';
                     $down = '';
                 }
                 ?>
-                <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>" class="thumbUp"
-                   <?php echo $up; ?>title="I like this feed!"><span class="icon"/></span>
+                <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>"
+                   class="thumbUp<?php echo $up; ?>" title="I like this feed!"><span class="icon"/></span>
                     Leet</a>
                 <a href="<?php echo ($this->identity()) ? "#" : $this->url("login"); ?>"
-                   class="thumbDown"<?php echo $down; ?> title="This feed is meh."><span class="icon"></span>Meh</a>
+                   class="thumbDown<?php echo $down; ?>" title="This feed is meh."><span class="icon"></span>Meh</a>
 
                 <div id="total"><span class="icon"></span><span class="count"><?php echo $feed->getRating(); ?></span>
                 </div>
@@ -66,7 +66,7 @@ $hasPrivileges = $this->account() ? $this->account()->hasSuperPrivileges() : fal
         <div class="moduleBody">
             <?php if ($comments->count() > 0): ?>
 
-                <ul id="commentList"  itemscope itemtype="http://schema.org/UserComments">
+                <ul id="commentList" itemscope itemtype="http://schema.org/UserComments">
                     <?php foreach ($comments as $comment): ?>
                         <?php echo $this->partial("comment", array('comment' => $comment)); ?>
                     <?php endforeach; ?>
@@ -92,7 +92,7 @@ $hasPrivileges = $this->account() ? $this->account()->hasSuperPrivileges() : fal
             <ul class="verticalFeedList">
                 <?php
                 foreach ($relatedFeeds as $feed) {
-                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false,'hasPrivileges' => $hasPrivileges));
+                    echo $this->partial("feed", array('feed' => $feed, 'isPremium' => false, 'hasPrivileges' => $hasPrivileges));
                 }
                 ?>
             </ul>

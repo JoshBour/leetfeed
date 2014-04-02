@@ -305,9 +305,19 @@ class FeedController extends AbstractActionController
                 $data = $request->getPost();
                 $form->setData($data);
                 if($form->isValid()){
-                    $feed = $this->getFeedRepository()->findOneBy(array("videoId" => $data["feed"]["url"]));
+                    /**
+                     * @var $feed \Feed\Entity\Feed
+                     */
+                    parse_str(parse_url($data["feed"]["url"], PHP_URL_QUERY), $vars);
+                    $feed = $this->getFeedRepository()->findOneBy(array("videoId" => $vars['v']));
                     if(!$feed){
                         $feed = $this->getFeedService()->add($data);
+                    }else{
+                        $em = $this->getEntityManager();
+                        $feed->setIsRelated(0);
+                        $feed->updatePostDate();
+                        $em->persist($feed);
+                        $em->flush();
                     }
                     $this->flashMessenger()->addMessage(self::MESSAGE_ADD_SUCCESS);
                     return $this->redirect()->toRoute(self::ROUTE_ADD_FEED);
