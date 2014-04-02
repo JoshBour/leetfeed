@@ -24,6 +24,7 @@ class FeedController extends AbstractActionController
 
     const MESSAGE_RATE_SUCCESS = 'The rating has been saved successfully.';
     const MESSAGE_RATE_FAIL = 'Something went wrong when saving the rating, please try again.';
+    const MESSAGE_ADD_SUCCESS = "The feed has been added successfully.";
 
     const ERROR_STORE_FEED = "There was an error when storing the feed.";
 
@@ -308,6 +309,7 @@ class FeedController extends AbstractActionController
                     if(!$feed){
                         $feed = $this->getFeedService()->add($data);
                     }
+                    $this->flashMessenger()->addMessage(self::MESSAGE_ADD_SUCCESS);
                     return $this->redirect()->toRoute(self::ROUTE_ADD_FEED);
                 }
             } else {

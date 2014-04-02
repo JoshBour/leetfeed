@@ -137,17 +137,27 @@ $(function () {
                 var thumbLink = feedThumbnail.children('a').find('img');
                 thumbLink.hide();
                 if (!players["preview-" + feedId]) {
-                    players["preview-" + feedId] = new YT.Player("preview-" + feedId, {
+                    var player = new YT.Player("preview-" + feedId, {
                         height: '200',
                         width: '348',
                         videoId: videoId,
-                        playerVars: { 'autoplay': 1, 'controls': 0, 'loop': 1, 'modestbranding': 0, 'showinfo': 0, 'autohide': 1},
+                        playerVars: {'controls': 0,
+                            'loop': 1,
+                            'modestbranding': 0,
+                            'showinfo': 0,
+                            'autohide': 1,
+                            'wmode' : 'transparent',
+                            'html5' : 1,
+                            'enablejsapi' : 1
+                        },
                         events: {
                             'onReady': function (e) {
                                 e.target.mute();
+                                e.target.playVideo();
                             }
                         }
                     });
+                    players["preview-" + feedId] = player;
                 } else {
                     var previewDiv = $("#preview-" + feedId);
                     if (!previewDiv.is("visible")) {
@@ -163,15 +173,12 @@ $(function () {
             var feedThumbnail = $(this);
             var list = feedThumbnail.closest('li');
             var feedId = list.attr('class').substr(5);
-            if (players["preview-" + feedId]) {
-                var feedThumbnail = $(this);
-                var list = feedThumbnail.closest('li');
-                var feedId = list.attr('class').substr(5);
-                var thumbLink = feedThumbnail.children('a').find('img');
-                var player = players["preview-" + feedId];
-                player.stopVideo();
-                $("#preview-" + feedId).hide();
-                thumbLink.show();
+            var player = players["preview-" + feedId];
+            if (player) {
+              //  var thumbLink = feedThumbnail.children('a').find('img');
+                player.pauseVideo();
+              //  $("#preview-" + feedId).hide();
+              //  thumbLink.show();
             }
         });
     }

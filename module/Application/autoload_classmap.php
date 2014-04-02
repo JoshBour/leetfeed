@@ -6,4 +6,5 @@ return array(
   'Application\Factory\ContactFormFactory' => __DIR__ . '/src/Application/Factory/ContactFormFactory.php',
   'Application\Form\ContactFieldset'       => __DIR__ . '/src/Application/Form/ContactFieldset.php',
   'Application\Form\ContactForm'           => __DIR__ . '/src/Application/Form/ContactForm.php',
+  'Application\Model\SitemapXmlParser'     => __DIR__ . '/src/Application/Model/SitemapXmlParser.php',
 );

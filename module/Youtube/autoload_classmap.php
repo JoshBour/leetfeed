@@ -4,8 +4,8 @@ return array(
   'Youtube\Module'              => __DIR__ . '/Module.php',
   'Youtube\Model\Channel'       => __DIR__ . '/src/Youtube/Model/Channel.php',
   'Youtube\Model\PlaylistItems' => __DIR__ . '/src/Youtube/Model/PlaylistItems.php',
-  'Youtube\Model\Video'         => __DIR__ . '/src/Youtube/Model/Video.php',
   'Youtube\Model\Response'      => __DIR__ . '/src/Youtube/Model/Response.php',
+  'Youtube\Model\Video'         => __DIR__ . '/src/Youtube/Model/Video.php',
   'Youtube\Model\YoutubeEntry'  => __DIR__ . '/src/Youtube/Model/YoutubeEntry.php',
   'Youtube\Service\Youtube'     => __DIR__ . '/src/Youtube/Service/Youtube.php',
 );

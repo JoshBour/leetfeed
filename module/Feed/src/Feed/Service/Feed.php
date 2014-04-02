@@ -12,6 +12,7 @@ namespace Feed\Service;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Zend\ServiceManager\ServiceManager;
+use Doctrine\ORM\UnitOfWork;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 class Feed implements ServiceManagerAwareInterface
@@ -108,7 +109,7 @@ class Feed implements ServiceManagerAwareInterface
                     $videos = $youtubeService->findByQuery("league of legends " . $champion . ' gameplay', null, intval($requiredFeedPerChampion - $championFeedsCount), "this_year");
                     foreach ($videos as $video) {
                         $feed = $this->createFromEntry($video, 1, false);
-                        $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
+                        $isPersisted = UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
                         if (!$championFeeds->contains($feed)) {
                             # $championFeeds[] = $feed;
                             $championEntity->addFeeds($feed);
@@ -157,7 +158,7 @@ class Feed implements ServiceManagerAwareInterface
                     $video->getTitle(),
                     $channel->getTitle(),
                     $video->getDescription(), 1, 0);
-                $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
+                $isPersisted = UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
                 if (!$isPersisted) $em->persist($feed);
                 $flush = true;
             }
@@ -186,10 +187,10 @@ class Feed implements ServiceManagerAwareInterface
         $game = $this->getGameRepository()->find(1);
         $feedRepository = $this->getFeedRepository();
         if (!$feed = $feedRepository->findOneBy(array("videoId" => $video->getId()))) {
-         #   $feed = \Feed\Entity\Feed::create($game, $video->getId(), $video->getTitle(), $video->getChannel()->getTitle(), $video->getDescription(), $related);
+            $feed = \Feed\Entity\Feed::create($game, $video->getId(), $video->getTitle(), $video->getChannel()->getTitle(), $video->getDescription(), $related);
             if ($flush || $persist) {
                 $em = $this->getEntityManager();
-                $isPersisted = \Doctrine\ORM\UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
+                $isPersisted = UnitOfWork::STATE_MANAGED === $em->getUnitOfWork()->getEntityState($feed);
                 if (!$isPersisted && $persist) $em->persist($feed);
                 if ($flush) $em->flush();
             }
