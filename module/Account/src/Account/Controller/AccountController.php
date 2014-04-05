@@ -287,7 +287,7 @@ class AccountController extends AbstractActionController
         if ($authResult->isValid()) {
             if ($remember == 1) {
                 $this->getAuthStorage()->setRememberMe(1);
-                $authService->setStorage($this->getAuthStorage());
+              #  $authService->setStorage($this->getAuthStorage());
             }
             $identity = $authResult->getIdentity();
             $this->getAccountService()->updateLastSeen($identity, true);

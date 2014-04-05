@@ -243,6 +243,7 @@ return array(
         ),
         'template_map' => array(
             'feed' => __DIR__ . '/../view/feed/partial/feed.phtml',
+            'improve_unregistered' => __DIR__ . '/../view/feed/feed/improve.unregistered.phtml',
             'comment' => __DIR__ . '/../view/feed/partial/comment.phtml'
         ),
     ),

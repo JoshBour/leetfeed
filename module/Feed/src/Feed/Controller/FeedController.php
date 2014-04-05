@@ -9,6 +9,7 @@
 
 namespace Feed\Controller;
 
+use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityRepository;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -111,6 +112,7 @@ class FeedController extends AbstractActionController
                     return new ViewModel(array(
                         "feeds" => $feeds,
                         "summoners" => $summoners,
+                        "noAds" => true,
                         "activeSummonerName" => $summoner->getName(),
                         "pageTitle" => "Improve your League of Legends play skills"
                     ));
@@ -119,7 +121,12 @@ class FeedController extends AbstractActionController
                 }
             }
         } else {
-            return $this->redirect()->toRoute(self::ROUTE_LOGIN);
+            $viewModel = new ViewModel(array(
+                "noAds" => true
+            ));
+            $viewModel->setTemplate("improve_unregistered");
+
+            return $viewModel;
         }
     }
 
@@ -315,6 +322,9 @@ class FeedController extends AbstractActionController
                     }else{
                         $em = $this->getEntityManager();
                         $feed->setIsRelated(0);
+                        if($data["feed"]["title"]){
+                            $feed->setTitle($data["feed"]["title"]);
+                        }
                         $feed->updatePostDate();
                         $em->persist($feed);
                         $em->flush();

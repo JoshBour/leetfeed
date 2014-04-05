@@ -57,7 +57,7 @@ class IndexController extends AbstractActionController
         $sitemapXmlParser = new \Application\Model\SitemapXmlParser();
         $sitemapXmlParser->begin();
         if (!$type) {
-            $feedCount = $this->getFeedRepository()->countFeeds();
+            $feedCount = $this->getFeedRepository()->countFeeds(0,0);
             $pageCount = $feedCount > 15000 ? $feedCount / 15000 : 1;
             if (!is_int($pageCount)) {
                 $pageCount = intval($pageCount) + 1;
@@ -74,7 +74,7 @@ class IndexController extends AbstractActionController
             } else {
                 $index = $this->params()->fromRoute("index");
                 $limits = explode("-", $index);
-                $feeds = $this->getFeedRepository()->findBy(array(), array(), 15000, $limits[0]);
+                $feeds = $this->getFeedRepository()->findBy(array("isIgnored" => 0,"isRelated" => 0), array(), 15000, $limits[0]);
                 foreach ($feeds as $feed) {
                     $pages[] = "/feed/" . $feed->getFeedId();
                 }

@@ -41,23 +41,23 @@ if (!empty($messages)) :
     </div>
 </header>
 <div id="content">
-    <?php if (!isset($_COOKIE['facebookModerator'])): ?>
-        <div id="announcement" class="module" data-scope="facebookModerator">
-            <p>Are you going to be our new facebook page moderator? Feel free to apply at our <a
-                    href="<?php echo $this->url('contact'); ?>">contact page</a> using the subject title "Facebook
-                Application"!</p>
-
-            <div class="remove">X</div>
-        </div>
-    <?php endif; ?>
+<!--    --><?php //if (!isset($_COOKIE['facebookModerator'])): ?>
+<!--        <div id="announcement" class="module" data-scope="facebookModerator">-->
+<!--            <p>Are you going to be our new facebook page moderator? Feel free to apply at our <a-->
+<!--                    href="--><?php //echo $this->url('contact'); ?><!--">contact page</a> using the subject title "Facebook-->
+<!--                Application"!</p>-->
+<!---->
+<!--            <div class="remove">X</div>-->
+<!--        </div>-->
+<!--    --><?php //endif; ?>
     <?php if(!$child->noAds): ?>
     <div id="advertisement" class="module">
         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
         <!-- Leetfeed Adsense -->
         <ins class="adsbygoogle"
-             style="display:inline-block;<?php echo $this->mobile() ? 'width:320px;height:100px' : 'width:728px;height:90px'; ?>"
+             style="display:inline-block;<?php echo $this->mobile() ? 'width:300px;height:250px' : 'width:728px;height:90px'; ?>"
              data-ad-client="ca-pub-6737088231270252"
-             data-ad-slot="<?php echo $this->mobile() ? '1617814616' : '3425951819'; ?>"></ins>
+             data-ad-slot="<?php echo $this->mobile() ? '5904753418' : '3425951819'; ?>"></ins>
         <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
         </script>

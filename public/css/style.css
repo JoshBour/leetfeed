@@ -285,6 +285,7 @@
 
     #main{
         width: 1165px;
+        min-height: 800px;
         margin: 0 auto;
         padding-bottom:35px;
     }
@@ -696,6 +697,26 @@
 
         #share{
             float:left;
+        }
+
+    /* ===================================================== */
+    /*                    improve page                       */
+        #improve img{
+            margin:10px auto;
+            text-align:center;
+            display:block;
+            border: 1px solid #222;
+        }
+
+        #improve .halfSized{
+            margin-top:0;
+            font: normal 14px "Source sans pro";
+        }
+
+        #improve h2{
+            text-align:left;
+            padding:5px;
+            border-bottom:1px dashed #555;
         }
 
         /* ===================================================== */
