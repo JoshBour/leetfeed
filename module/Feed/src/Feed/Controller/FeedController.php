@@ -114,7 +114,7 @@ class FeedController extends AbstractActionController
                         "summoners" => $summoners,
                         "noAds" => true,
                         "activeSummonerName" => $summoner->getName(),
-                        "pageTitle" => "Improve your League of Legends play skills"
+                        "pageTitle" => "Leetfeed | Improve your skills with League of Legends tutorials",
                     ));
                 } else {
                     return $this->notFoundAction();
@@ -122,7 +122,8 @@ class FeedController extends AbstractActionController
             }
         } else {
             $viewModel = new ViewModel(array(
-                "noAds" => true
+                "noAds" => true,
+                "pageTitle" => "Leetfeed | Improve your skills with League of Legends tutorials",
             ));
             $viewModel->setTemplate("improve_unregistered");
 
@@ -140,7 +141,7 @@ class FeedController extends AbstractActionController
     {
         return new ViewModel(array(
             "includeProgressBar" => true,
-            "pageTitle" => "Find a random League of Legends feed!"
+            "pageTitle" => "Leetfeed | Find a random League of Legends video feed"
         ));
     }
 
@@ -224,7 +225,7 @@ class FeedController extends AbstractActionController
             "bodyClass" => "famousPage",
             "noAds" => true,
             "randomYoutuber" => $randomYoutuber,
-            "pageTitle" => "Feeds from the League of Legends pros and famous youtubers"
+            "pageTitle" => "Leetfeed - League of Legends videos from Pros and famous Youtubers"
         ));
     }
 
@@ -276,8 +277,9 @@ class FeedController extends AbstractActionController
         $account = $this->account();
         return new ViewModel(array(
             "feeds" => $account->getLikedFeeds(),
-            "pageTitle" => "Leeted feeds",
-            "noAds" => true
+            "pageTitle" => "Leetfeed | Feeds you marked as leet",
+            "noAds" => true,
+            "follow" => false
         ));
     }
 
@@ -298,8 +300,9 @@ class FeedController extends AbstractActionController
         return new ViewModel(array(
             "feeds" => $feeds,
             "sort" => $sort,
-            "pageTitle" => "The feeds you have watched",
-            "noAds" => true
+            "pageTitle" => "Leetfeed | Feeds you watched",
+            "noAds" => true,
+            "follow" => false
         ));
     }
 
@@ -353,7 +356,8 @@ class FeedController extends AbstractActionController
             }
             return new ViewModel(array(
                 "form" => $form,
-                "noAds" => true
+                "noAds" => true,
+                "follow" => false,
             ));
         }
         return $this->notFoundAction();
@@ -376,7 +380,8 @@ class FeedController extends AbstractActionController
                 "nextToken" => $response->getNextPageToken(),
                 "feeds" => $feeds,
                 "noAds" => true,
-                "bodyClass" => "generatePage"
+                "bodyClass" => "generatePage",
+                "follow" => false,
             ));
         }
         return $this->notFoundAction();
@@ -437,7 +442,7 @@ class FeedController extends AbstractActionController
                 return new ViewModel(array(
                     "feed" => $feed,
                     'ogTags' => $feed->getOgTags(),
-                    "pageTitle" => $feed->getTitle(),
+                    "pageTitle" => "League of Legends video - " . $feed->sanitize($feed->getTitle(),50),
                     "relatedFeeds" => $related,
                     "metaInfo" => $metaInfo,
                     "bodyClass" => "feedPage"

@@ -132,7 +132,8 @@ class AccountController extends AbstractActionController
                     'leagueService' => $this->getLeagueService(),
                     "includeAjaxForm" => true,
                     "pageTitle" => "Your League of Legends summoners",
-                    "noAds" => true
+                    "noAds" => true,
+                    "follow" => false
                 ));
             }
         }else{
@@ -160,7 +161,8 @@ class AccountController extends AbstractActionController
             }
             return new JsonModel(array(
                 "success" => $success,
-                "message" => $message
+                "message" => $message,
+                "follow" => false
             ));
         }else{
             return $this->notFoundAction();
@@ -197,7 +199,7 @@ class AccountController extends AbstractActionController
             }
             return new ViewModel(array(
                 'form' => $loginForm,
-                "pageTitle" => "Login to your account",
+                "pageTitle" => "Login to your Leetfeed account",
                 "noAds" => true
             ));
         } else {
@@ -254,7 +256,7 @@ class AccountController extends AbstractActionController
             }
             return new ViewModel(array(
                 'form' => $form,
-                "pageTitle" => "Register a new account",
+                "pageTitle" => "Register a new Leetfeed account",
                 "noAds" => true
             ));
         } else {

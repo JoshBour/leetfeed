@@ -150,7 +150,7 @@ class Feed {
         return $this->sanitize($this->description,$maxLength);
     }
 
-    private function sanitize($data,$length){
+    public function sanitize($data,$length){
         $data = strlen($data) > $length ? substr($data, 0, $length) . ".." : $data;
         return htmlentities($data);
     }

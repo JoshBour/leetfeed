@@ -2,14 +2,15 @@
     <?php
     $child = $this->child;
     $isMobile = $this->mobile();
-    $pageTitle = (isset($child->pageTitle)) ? "Leetfeed - " . $child->pageTitle : "Leetfeed - The Best League Of Legends Videos.";
+    $pageTitle = (isset($child->pageTitle)) ? $child->pageTitle : "Leetfeed | League of Legends Videos, Gameplay, Tutorials";
+    $follow = (isset($child->follow)) ? "noindex, nofollow" : "feed, follow, archieve";
 
     // The website's title.
     echo $this->headTitle($pageTitle);
 
     // The meta tags
-    $description = isset($child->metaInfo['description']) ? $child->metaInfo['description'] : 'Leetfeed has the best League of Legends videos on the internet and can help you improve by providing Pro gameplays based on the latest champions you played.';
-    $keywords = isset($child->metaInfo['keywords']) ? $child->metaInfo['keywords'] : 'league, of, legends, best, videos, gameplay, pro, players, leetfeed, youtube';
+    $description = isset($child->metaInfo['description']) ? $child->metaInfo['description'] : 'Leetfeed provides the best League of Legends gameplay, videos, tutorials and can help you improve.';
+    $keywords = isset($child->metaInfo['keywords']) ? $child->metaInfo['keywords'] : 'league, of, legends, best, videos, gameplay, pro, players, funny, epic, leetfeed, youtube';
 
     // The og tags
     $ogTitle = isset($child->ogTags["title"]) ? $child->ogTags["title"] : "Leetfeed - The Best League of Legends videos.";
@@ -25,9 +26,9 @@
         ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
         ->appendName('description', $description)
         ->appendName('keywords', $keywords)
-        ->appendName('robots', 'feed, follow')
+        ->appendName('robots', $follow)
         ->appendName('language', 'en')
-        ->appendName('googlebot', 'feed, follow, archive')
+        ->appendName('googlebot', $follow)
         ->appendProperty('fb:app_id', '268335233334900')
         ->appendProperty('fb:admins', '1124061431')
         ->appendProperty("og:site_name", "Leetfeed")

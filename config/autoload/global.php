@@ -19,6 +19,7 @@ return array(
         '/',
         '/faq',
         '/promote',
+        '/improve',
         '/contact',
         '/random',
         '/famous',

@@ -1,8 +1,9 @@
 <div id="main">
     <div id="login" class="module">
         <div class="moduleBody">
+            <h1><?php echo $this->translate("Login to Leetfeed"); ?></h1>
             <img class="centeredImage" src="<?php echo $this->basePath('images/leetfeed-medium.png'); ?>"
-                 alt="<?php echo $this->translate("Leetfeed Logo"); ?>"/>
+                 alt="<?php echo $this->translate("Leetfeed Logo"); ?>" width="200" height="200" />
             <?php
             $form->prepare();
             $form->setAttribute('action', $this->url('login'));
@@ -42,7 +43,7 @@
             <?php echo $this->form()->closeTag() ?>
 
             <p>
-                Do you not have an account? Click <a href="<?php echo $this->url('register'); ?>">here to register.</a>
+                Do you not have an account? Click <a href="<?php echo $this->url('register'); ?>" title="Leetfeed register">here to register.</a>
             </p>
         </div>
     </div>

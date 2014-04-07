@@ -20,7 +20,7 @@ if ($feed) {
             <div id="preview-<?php echo $feedId; ?>"></div>
             <?php
             echo '<a href="' . $this->url('feed/view', array('feedId' => $feedId)) . '" target="_top" title="Click to watch the feed">';
-            echo '<img src="' . $feed->getThumbnail("medium") . '" />';
+            echo '<img src="' . $feed->getThumbnail("high") . '" />';
             echo '</a>';
             ?>
             <div class="videoMask"></div>

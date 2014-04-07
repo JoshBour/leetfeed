@@ -1,24 +1,24 @@
 <div id="main">
     <div class="module halfSized">
-        <h1>League of Legends Accounts</h1>
-
         <div class="moduleBody">
+            <h1><?php echo $this->translate('League of Legends Account Summoners'); ?></h1>
             <?php if ($summoners->count() > 0): ?>
                 <ul class="summoners">
                     <?php foreach ($summoners as $summoner): ?>
                         <li class="summoner-<?php echo $summoner->getSummonerId(); ?>">
-                            <a href="<?php echo $this->url('improve', array('summonerId' => $summoner->getSummonerId())); ?>" title="Improve using champions from <?php echo $summoner->getName(); ?>">
+                            <a href="<?php echo $this->url('improve', array('summonerId' => $summoner->getSummonerId())); ?>"
+                               title="League of Legends gameplay tutorials for <?php echo $summoner->getName(); ?>">
                                 <div class="summonerBody">
                                     <span class="author"><?php echo $summoner->getName(); ?></span>
                                     <?php echo ' on ' . strtoupper($summoner->getRegion()); ?>
                                 </div>
                                 <div class="summonerChampions">
-                                    Last Played:
+                                    Latest Played Champions:
                                     <?php
                                     $champions = $leagueService->getLatestChampions($summoner);
                                     if (!empty($champions)) {
-                                        $championNames = join(',',$champions);
-                                        echo $championNames;
+                                        $championNames = join(' , ', $champions);
+                                        echo '<span>' . $championNames . '</span>';
                                     } else {
                                         echo "None";
                                     }
@@ -26,24 +26,25 @@
                                 </div>
                             </a>
 
-                            <div class="summonerMeta">X</div>
+                            <div class="summonerMeta link" title="<?php echo $this->translate("Remove this summoner from your account"); ?>">Remove</div>
                         </li>
                     <?php endforeach; ?>
                 </ul>
             <?php else: ?>
-                <div class="empty">You haven't added a League of Legends account yet! Add one using the button
-                    on the right.
+                <div class="empty"><?php echo $this->translate("You haven't added a <strong>League of Legends summoner</strong> to your account yet! Add one using the button
+                    on the right."); ?>
                 </div>
             <?php endif ?>
             <?php if ($summoners->count() < 10): ?>
-                <div id="addSummonerToggle">Add +</div>
+                <div id="addSummonerToggle" class="link"><?php echo $this->translate("Add Summoner"); ?></div>
             <?php endif; ?>
         </div>
     </div>
 </div>
 <?php if ($summoners->count() < 10): ?>
     <div id="addSummoner">
-        <h3>Add a new League of Legends account</h3>
+        <h2><?php echo $this->translate("Add a new League of Legends Summoner"); ?></h2>
+        <p><?php echo $this->translate("Type the name and the region of the league of legends summoner you want to add!"); ?></p>
         <?php
         $form->prepare();
         $form->setAttribute('action', $this->url('account/summoners'));

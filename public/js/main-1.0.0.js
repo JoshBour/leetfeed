@@ -138,8 +138,8 @@ $(function () {
                 thumbLink.hide();
                 if (!players["preview-" + feedId]) {
                     var player = new YT.Player("preview-" + feedId, {
-                        height: '200',
-                        width: '348',
+                        height: '274',
+                        width: '365',
                         videoId: videoId,
                         playerVars: {'controls': 0,
                             'loop': 1,

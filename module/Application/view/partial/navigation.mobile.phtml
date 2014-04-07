@@ -19,13 +19,6 @@
                 <a href="<?php echo $this->url("register"); ?>" title="Register to Leetfeed">Register</a>
             </li>
         <?php else: ?>
-            <li id="userNav">
-                <a href="#"
-                   title="<?php echo $this->translate("My Profile"); ?>" id="navToggle">
-
-                    <?php echo ucfirst($this->identity()->getUsername()); ?>
-                </a>
-            </li>
             <?php if($this->identity() && $this->account()->hasSuperPrivileges()): ?>
                 <li>
                     <a href="<?php echo $this->url("feed/add"); ?>" title="Add Feed">Add Feed</a>

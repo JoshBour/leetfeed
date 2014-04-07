@@ -194,7 +194,7 @@ class IndexController extends AbstractActionController
     public function faqAction()
     {
         return new ViewModel(array(
-            "pageTitle" => "Frequently Asked Questions",
+            "pageTitle" => "Leetfeed | Frequently Asked Questions",
             "noAds" => true
         ));
     }
@@ -208,7 +208,7 @@ class IndexController extends AbstractActionController
     public function promoteAction()
     {
         return new ViewModel(array(
-            "pageTitle" => "Promote your feeds!",
+            "pageTitle" => "Leetfeed | Promote and advertise your League of Legends videos",
             "noAds" => true
         ));
     }
@@ -261,7 +261,7 @@ class IndexController extends AbstractActionController
         }
         return new ViewModel(array(
             "form" => $form,
-            "pageTitle" => "Contact Us",
+            "pageTitle" => "Leetfeed | Contact Us",
             "noAds" => true
         ));
     }

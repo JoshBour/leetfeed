@@ -1,8 +1,7 @@
 <div id="main">
     <div class="module">
-        <h1>Youtubers / Pros</h1>
-
         <div class="moduleBody">
+            <h1>Youtubers / Pros</h1>
             <ul id="youtubers">
                 <?php foreach ($youtubers as $youtuber): ?>
                     <li<?php if ($randomYoutuber->getYoutuberId() == $youtuber->getYoutuberId()) echo ' class="active" ' ?>>
@@ -15,9 +14,8 @@
         </div>
     </div>
     <div class="module">
-        <h1><?php echo $randomYoutuber->getIgName(); ?>'s Latest Feeds</h1>
-
         <div class="moduleBody">
+            <h1><?php echo $randomYoutuber->getIgName(); ?>'s Latest Feeds</h1>
             <?php if (count($feeds) > 0) { ?>
                 <ul data-token="<?php echo $nextToken; ?>" class="verticalFeedList" id="youtubersFeeds">
                     <?php

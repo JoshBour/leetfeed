@@ -2,31 +2,31 @@
 $form->prepare();
 $form->setAttribute('action', $this->url('account/summoners'));
 $fieldset = $form->get('summoner');
-if($error){
+if ($error) {
     echo '<div class="error">' . $error . "</div>";
 }
 echo $this->form()->openTag($form);
 echo $this->formHidden($form->get('security'));
 ?>
-<div class="element">
-    <?php
-    echo $this->formElementErrors($fieldset->get('name'), array('class' => 'formError'));
-    echo $this->formLabel($fieldset->get('name'));
-    echo $this->formInput($fieldset->get('name'));
-    ?>
-</div>
+    <div class="element">
+        <?php
+        echo $this->formElementErrors($fieldset->get('name'), array('class' => 'formError'));
+        echo $this->formLabel($fieldset->get('name'));
+        echo $this->formInput($fieldset->get('name'));
+        ?>
+    </div>
 
-<div class="element">
-    <?php
-    echo $this->formElementErrors($fieldset->get('region'), array('class' => 'formError'));
-    echo $this->formLabel($fieldset->get('region'));
-    echo $this->formSelect($fieldset->get('region'));
-    ?>
-</div>
+    <div class="element">
+        <?php
+        echo $this->formElementErrors($fieldset->get('region'), array('class' => 'formError'));
+        echo $this->formLabel($fieldset->get('region'));
+        echo $this->formSelect($fieldset->get('region'));
+        ?>
+    </div>
 
 
-<div class="element">
-    <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Submit'))); ?>
-</div>
+    <div class="element">
+        <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Submit'))); ?>
+    </div>
 
 <?php echo $this->form()->closeTag() ?>
