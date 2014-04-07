@@ -57,7 +57,7 @@ class IndexController extends AbstractActionController
         $sitemapXmlParser = new \Application\Model\SitemapXmlParser();
         $sitemapXmlParser->begin();
         if (!$type) {
-            $feedCount = $this->getFeedRepository()->countFeeds(0,0);
+            $feedCount = $this->getFeedRepository()->countFeeds(false,false);
             $pageCount = $feedCount > 15000 ? $feedCount / 15000 : 1;
             if (!is_int($pageCount)) {
                 $pageCount = intval($pageCount) + 1;
@@ -68,27 +68,29 @@ class IndexController extends AbstractActionController
                 $sitemapXmlParser->addSitemap("http://www.leetfeed.com/sitemap/dynamic/" . $i * 15000 . "-" . ($i + 1) * 15000);
 
         } else {
-            $pages = array();
             if ($type == "static") {
                 $pages = $this->getServiceLocator()->get('Config')['static_pages'];
+                $sitemapXmlParser->addHeader("urlset");
+                foreach ($pages as $page) {
+                    $sitemapXmlParser->addUrl("http://www.leetfeed.com" . $page);
+                }
             } else {
                 $index = $this->params()->fromRoute("index");
                 $limits = explode("-", $index);
                 $feeds = $this->getFeedRepository()->findBy(array("isIgnored" => 0,"isRelated" => 0), array(), 15000, $limits[0]);
+
+                $sitemapXmlParser->addHeader("urlset",true);
+                $i = 0;
                 foreach ($feeds as $feed) {
-                    $pages[] = "/feed/" . $feed->getFeedId();
+                    if ($i == 20) {
+                        $sitemapXmlParser->show();
+                        $i = 0;
+                    }
+                    $sitemapXmlParser->addFeedInfo($feed);
+                    $i++;
                 }
             }
-            $sitemapXmlParser->addHeader("urlset");
-            $i = 0;
-            foreach ($pages as $page) {
-                if ($i == 20) {
-                    $sitemapXmlParser->show();
-                    $i = 0;
-                }
-                $sitemapXmlParser->addUrl("http://www.leetfeed.com" . $page);
-                $i++;
-            }
+
         }
         $view = new ViewModel();
         $view->setTerminal(true);
