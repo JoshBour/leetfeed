@@ -467,7 +467,7 @@
 
     /* ===================================================== */
     /*                      Contact Page                     */
-        #contactForm, #loginForm, #registerForm, #addFeedForm{
+        .standardForm{
             width:550px;
             margin:0 auto;
         }

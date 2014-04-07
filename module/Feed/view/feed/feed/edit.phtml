@@ -1,0 +1,35 @@
+<div id="main">
+    <div class="module halfSized">
+        <h1>Edit Feed Info</h1>
+        <?php
+        $form->prepare();
+        $form->setAttribute('action', $this->url('feed/edit'));
+        $fieldset = $form->get('feed');
+
+        echo $this->form()->openTag($form);
+        echo $this->formHidden($form->get('security'));
+        echo $this->formHidden($fieldset->get('feedId'));
+        ?>
+        <div class="element">
+            <?php
+            echo $this->formElementErrors($fieldset->get('title'), array('class' => 'formError'));
+            echo $this->formLabel($fieldset->get('title'));
+            echo $this->formInput($fieldset->get('title'));
+            ?>
+        </div>
+
+        <div class="element">
+            <?php
+            echo $this->formElementErrors($fieldset->get('videoId'), array('class' => 'formError'));
+            echo $this->formLabel($fieldset->get('videoId'));
+            echo $this->formInput($fieldset->get('videoId'));
+            ?>
+        </div>
+
+        <div class="element">
+            <?php echo $this->formSubmit($form->get('submit')->setValue($this->translate('Edit'))); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag() ?>
+    </div>
+</div>

@@ -5,7 +5,7 @@
             <ul id="youtubers">
                 <?php foreach ($youtubers as $youtuber): ?>
                     <li<?php if ($randomYoutuber->getYoutuberId() == $youtuber->getYoutuberId()) echo ' class="active" ' ?>>
-                        <img src="<?php echo $youtuber->getThumbnail(); ?>"/>
+                        <img src="<?php echo $youtuber->getThumbnail(); ?>" alt="youtuber thumbnail" width="98" height="98"/>
                         <span
                             class="youtuber-<?php echo $youtuber->getName(); ?>"><?php echo $youtuber->getIgName(); ?></span>
                     </li>

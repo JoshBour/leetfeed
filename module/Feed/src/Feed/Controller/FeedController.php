@@ -26,6 +26,7 @@ class FeedController extends AbstractActionController
     const MESSAGE_RATE_SUCCESS = 'The rating has been saved successfully.';
     const MESSAGE_RATE_FAIL = 'Something went wrong when saving the rating, please try again.';
     const MESSAGE_ADD_SUCCESS = "The feed has been added successfully.";
+    const MESSAGE_EDIT_SUCCESS = "The feed has been edited successfully.";
 
     const ERROR_STORE_FEED = "There was an error when storing the feed.";
 
@@ -35,6 +36,13 @@ class FeedController extends AbstractActionController
      * @var \Zend\Form\Form
      */
     private $addFeedForm;
+
+    /**
+     * The edit feed form
+     *
+     * @var \Zend\Form\Form
+     */
+    private $editFeedForm;
 
     /**
      * The entity manager
@@ -306,6 +314,40 @@ class FeedController extends AbstractActionController
         ));
     }
 
+    public function editAction(){
+        if ($this->identity() && $this->account()->hasSuperPrivileges()) {
+            $form = $this->getEditFeedForm();
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $data = $request->getPost();
+                $feed = $this->getFeedRepository()->find($data['feed']['feedId']);
+                $form->setData($data);
+                $form->bind($feed);
+                if($form->isValid()){
+                    $feed->setTitle($data['feed']['title']);
+                    $feed->setVideoId($data['feed']['videoId']);
+                    $em = $this->getEntityManager();
+                    $em->persist($feed);
+                    $em->flush();
+                    $this->flashMessenger()->addMessage(self::MESSAGE_EDIT_SUCCESS);
+                    return $this->redirect()->toRoute(self::ROUTE_HOME);
+                }
+            } else {
+                $feedId = $this->params()->fromRoute("feedId", null);
+                if ($feedId) {
+                    $feed = $this->getFeedRepository()->find($feedId);
+                    $form->bind($feed);
+                }
+            }
+            return new ViewModel(array(
+                "form" => $form,
+                "noAds" => true,
+                "follow" => false,
+            ));
+        }
+        return $this->notFoundAction();
+    }
+
     public function addAction()
     {
         if ($this->identity() && $this->account()->hasSuperPrivileges()) {
@@ -438,11 +480,11 @@ class FeedController extends AbstractActionController
                 $related = $this->getGenerator()->getRelatedFeeds($feed);
                 $metaInfo = array();
                 $metaInfo["keywords"] = $feed->getKeywords();
-                $metaInfo['description'] = $feed->getCleanDescription();
+                $metaInfo['description'] = $feed->getCleanDescription(130);
                 return new ViewModel(array(
                     "feed" => $feed,
                     'ogTags' => $feed->getOgTags(),
-                    "pageTitle" => "League of Legends video - " . $feed->sanitize($feed->getTitle(),50),
+                    "pageTitle" => "League of Legends Video - " . $feed->sanitize($feed->getTitle(),50),
                     "relatedFeeds" => $related,
                     "metaInfo" => $metaInfo,
                     "bodyClass" => "feedPage"
@@ -499,6 +541,17 @@ class FeedController extends AbstractActionController
         if(null === $this->addFeedForm)
             $this->addFeedForm = $this->getServiceLocator()->get('add_feed_form');
         return $this->addFeedForm;
+    }
+
+    /**
+     * Retrieve the add feed form
+     *
+     * @return \Zend\Form\Form
+     */
+    public function getEditFeedForm(){
+        if(null === $this->addFeedForm)
+            $this->editFeedForm = $this->getServiceLocator()->get('edit_feed_form');
+        return $this->editFeedForm;
     }
 
     /**

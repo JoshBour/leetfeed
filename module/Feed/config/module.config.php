@@ -148,6 +148,15 @@ return array(
                             ),
                         ),
                     ),
+                    'edit' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => '/edit[/:feedId]',
+                            'defaults' => array(
+                                'action' => 'edit',
+                            ),
+                        ),
+                    ),
                     'rate' => array(
                         'type' => 'Zend\Mvc\Router\Http\Segment',
                         'options' => array(
@@ -225,7 +234,8 @@ return array(
             'generator' => 'Feed\Model\FeedGenerator',
         ),
         'factories' => array(
-            'add_feed_form' => 'Feed\Factory\AddFeedFormFactory'
+            'add_feed_form' => 'Feed\Factory\AddFeedFormFactory',
+            'edit_feed_form' => 'Feed\Factory\EditFeedFormFactory'
         )
     ),
     'controllers' => array(

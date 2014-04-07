@@ -171,8 +171,8 @@ class Feed {
      */
     public function getOgTags(){
         $ogTags = array();
-        $ogTags["title"] = $this->title;
-        $ogTags["description"] = $this->getCleanDescription(200);
+        $ogTags["title"] = $this->sanitize($this->title,50);
+        $ogTags["description"] = $this->getCleanDescription(150);
         $ogTags["image"] = $this->getThumbnail("medium");
         $ogTags["url"] = "http://www.leetfeed.com/feed/" . $this->feedId;
         $ogTags["type"] = "video.movie";
