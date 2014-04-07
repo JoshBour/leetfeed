@@ -308,7 +308,7 @@ class FeedController extends AbstractActionController
 
     public function addAction()
     {
-        if ($this->account()->hasSuperPrivileges()) {
+        if ($this->identity() && $this->account()->hasSuperPrivileges()) {
             $form = $this->getAddFeedForm();
             $request = $this->getRequest();
             if ($request->isPost()) {

@@ -77,6 +77,7 @@ class SitemapXmlParser
         $ogTags = $feed->getOgTags();
         $this->writer->startElement('url');
         $this->writer->writeElement('loc', "http://www.leetfeed.com/feed/" . $feed->getFeedId());
+        $this->writer->writeElement('lastmod', date(\Datetime::ATOM, time()));
         $this->writer->startElement('image:image');
         $this->writer->writeElement('image:loc', $feed->getThumbnail());
         $this->writer->endElement();
