@@ -172,8 +172,8 @@ class Feed {
     public function getOgTags(){
         $ogTags = array();
         $ogTags["title"] = $this->sanitize($this->title,50);
-        $ogTags["description"] = $this->getCleanDescription(150);
-        $ogTags["image"] = $this->getThumbnail("medium");
+        $ogTags["description"] = "Watch this and other awesome League of Legends videos on leetfeed.com";
+        $ogTags["image"] = $this->getThumbnail("high");
         $ogTags["url"] = "http://www.leetfeed.com/feed/" . $this->feedId;
         $ogTags["type"] = "video.movie";
         $ogTags["video"] = "http://www.youtube.com/v/" . $this->videoId . '?version=3&amp;autohide=1';

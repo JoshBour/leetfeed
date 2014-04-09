@@ -104,11 +104,17 @@ $(function () {
     }
 
     // open in new window
-    $(document).on("click", '.openInWindow', function () {
+    $(document).on("click", '.fb-share', function () {
+        var url = $(this).attr("href");
+        fbShare(url,650,400);
+
+        event.preventDefault();
+    });
+
+    $(document).on("click", '.twitter-share', function () {
         var url = $(this).attr("href");
         var windowName = "popUp";//$(this).attr("name");
         var windowSize = "width=650,height=400,scrollbars=yes";
-
         window.open(url, windowName, windowSize);
 
         event.preventDefault();
